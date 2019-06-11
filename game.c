@@ -21,13 +21,13 @@ void init(game_t *game, const char* title, int xpos, int ypos, int width, int he
     }else{
         game->is_running = false;
     }
-    game->playing_map = false;
+    game->gamestatus = INVALID;
 }
 
 void init_beatmap(game_t *game, beatmap map){
     game->map = map;
     render_game(game);
-    game->playing_map = true;
+    game->gamestatus = PLAYING;
     game->paused = true;
 }
 
@@ -45,7 +45,7 @@ bool handle_game_io(game_t *game){
                         game->map[0][0] = FINISHED_BEAT;
                     } else {
                         game->map[0][0] = FAILED_BEAT;
-                        game->playing_map = false;
+                        game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_f:
@@ -54,7 +54,7 @@ bool handle_game_io(game_t *game){
                         game->map[0][1] = FINISHED_BEAT;
                     } else {
                         game->map[0][1] = FAILED_BEAT;
-                        game->playing_map = false;
+                        game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_j:
@@ -63,7 +63,7 @@ bool handle_game_io(game_t *game){
                         game->map[0][2] = FINISHED_BEAT;
                     } else {
                         game->map[0][2] = FAILED_BEAT;
-                        game->playing_map = false;
+                        game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_k:
@@ -72,19 +72,12 @@ bool handle_game_io(game_t *game){
                         game->map[0][3] = FINISHED_BEAT;
                     } else {
                         game->map[0][3] = FAILED_BEAT;
-                        game->playing_map = false;
+                        game->gamestatus = GAME_LOST;
                     }
                     return true;
                 default:
                     return false;
             }
-//            if ((game->map[0][0] == NOTHING || game->map[0][0] == FINISHED_BEAT) &&
-//                (game->map[0][1] == NOTHING || game->map[0][1] == FINISHED_BEAT) &&
-//                (game->map[0][2] == NOTHING || game->map[0][2] == FINISHED_BEAT) &&
-//                (game->map[0][3] == NOTHING || game->map[0][3] == FINISHED_BEAT)) {
-//                SDL_Log("Early return");
-//                game->map++;
-//                return;
 //            }
         }
     }
@@ -111,18 +104,23 @@ void update_game(game_t *game){
         uint32_t initial_time = SDL_GetTicks();
         while (SDL_GetTicks() - initial_time < 500) {
             if (handle_game_io(game)){
+                SDL_Log("Input");
                 if (completed_row(game->map[0])){
                     SDL_Log("completed row");
                     game->map++;
                     return;
                 }
             };
+            if (!(game->gamestatus == PLAYING)){
+                return;
+            }
         }
         for (int i = 0; i < row_tile_amount; ++i) {
-            if (game->map[0][i] == SINGLE_BEAT || game->map[0][i] == HELD_BEAT ||
-                game->map[0][i] == END) {
-                game->playing_map = false;
+            if (game->map[0][i] == SINGLE_BEAT || game->map[0][i] == HELD_BEAT) {
+                game->gamestatus = GAME_LOST;
                 return;
+            }else if(game->map[0][i] == END){
+                game->gamestatus = GAME_WON;
             }
         }
         game->map++;
@@ -152,6 +150,13 @@ void render_game(game_t *game){
                     break;
                 default:
                     SDL_SetRenderDrawColor(game->renderer, 255,255,255,255);
+            }
+            if (j == 0){
+                if (game->gamestatus == GAME_WON){
+                    SDL_SetRenderDrawColor(game->renderer, 0,255,0,255);
+                }else if (game->gamestatus == GAME_LOST){
+                    SDL_SetRenderDrawColor(game->renderer, 255,0,0,255);
+                }
             }
             SDL_RenderFillRect(game->renderer, &(SDL_Rect){row_padding*(i+1) + i*tile_width,
                                                            col_padding*(j+1) + j*tile_height

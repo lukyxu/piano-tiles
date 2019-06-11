@@ -17,9 +17,11 @@ bool load_beatmap(char *address, beatmap beatmap) {
 
 
     fclose(fp);
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count + 8; i++) {
         beatmap[i] = calloc (4, sizeof(beat_t));
-        decode_beat(memory[i], beatmap[i]);
+        if (i < count) {
+            decode_beat(memory[i], beatmap[i]);
+        }
     }
 
     free(memory);

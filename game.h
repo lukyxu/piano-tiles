@@ -17,10 +17,16 @@
 #define col_tile_amount 6
 #define tile_width ((window_width - (row_tile_amount + 1)*row_padding)/row_tile_amount)
 #define tile_height ((window_height - (col_tile_amount + 1)*col_padding)/col_tile_amount)
+typedef enum GameStatus {
+    PLAYING,
+    GAME_WON,
+    GAME_LOST,
+    INVALID
+} gamestatus_t;
 
 typedef struct game {
     bool is_running;
-    bool playing_map;
+    gamestatus_t gamestatus;
     bool paused;
     SDL_Window *window;
     SDL_Renderer *renderer;

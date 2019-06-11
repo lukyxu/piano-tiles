@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         init_beatmap(game, map);
         while (SDL_PollEvent(&game->event));
 
-        while(game->playing_map){
+        while(game->gamestatus == PLAYING){
 //            SDL_Log("playing");
             handle_game_events(game);
             update_game(game);
