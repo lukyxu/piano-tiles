@@ -1,4 +1,4 @@
-# Install script for directory: /homes/yiz18/Lab/PianoTiles
+# Install script for directory: /homes/kx3418/Documents/piano_tiles
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/homes/yiz18/Lab/PianoTiles/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/homes/kx3418/Documents/piano_tiles/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

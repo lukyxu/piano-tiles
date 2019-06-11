@@ -48,10 +48,10 @@ RM = /usr/lib/clion-2018.2.2/bin/cmake/linux/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /homes/yiz18/Lab/PianoTiles
+CMAKE_SOURCE_DIR = /homes/kx3418/Documents/piano_tiles
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /homes/yiz18/Lab/PianoTiles/cmake-build-debug
+CMAKE_BINARY_DIR = /homes/kx3418/Documents/piano_tiles/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /homes/yiz18/Lab/PianoTiles/cmake-build-debug/CMakeFiles /homes/yiz18/Lab/PianoTiles/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /homes/kx3418/Documents/piano_tiles/cmake-build-debug/CMakeFiles /homes/kx3418/Documents/piano_tiles/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /homes/yiz18/Lab/PianoTiles/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /homes/kx3418/Documents/piano_tiles/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named PianoTiles
+# Target rules for targets named piano_tiles
 
 # Build rule for target.
-PianoTiles: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 PianoTiles
-.PHONY : PianoTiles
+piano_tiles: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 piano_tiles
+.PHONY : piano_tiles
 
 # fast build rule for target.
-PianoTiles/fast:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/build
-.PHONY : PianoTiles/fast
+piano_tiles/fast:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/build
+.PHONY : piano_tiles/fast
 
 beatmap.o: beatmap.c.o
 
@@ -129,7 +129,7 @@ beatmap.o: beatmap.c.o
 
 # target to build an object file
 beatmap.c.o:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/beatmap.c.o
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.o
 .PHONY : beatmap.c.o
 
 beatmap.i: beatmap.c.i
@@ -138,7 +138,7 @@ beatmap.i: beatmap.c.i
 
 # target to preprocess a source file
 beatmap.c.i:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/beatmap.c.i
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.i
 .PHONY : beatmap.c.i
 
 beatmap.s: beatmap.c.s
@@ -147,8 +147,35 @@ beatmap.s: beatmap.c.s
 
 # target to generate assembly for a file
 beatmap.c.s:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/beatmap.c.s
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.s
 .PHONY : beatmap.c.s
+
+game.o: game.c.o
+
+.PHONY : game.o
+
+# target to build an object file
+game.c.o:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/game.c.o
+.PHONY : game.c.o
+
+game.i: game.c.i
+
+.PHONY : game.i
+
+# target to preprocess a source file
+game.c.i:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/game.c.i
+.PHONY : game.c.i
+
+game.s: game.c.s
+
+.PHONY : game.s
+
+# target to generate assembly for a file
+game.c.s:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/game.c.s
+.PHONY : game.c.s
 
 main.o: main.c.o
 
@@ -156,7 +183,7 @@ main.o: main.c.o
 
 # target to build an object file
 main.c.o:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/main.c.o
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/main.c.o
 .PHONY : main.c.o
 
 main.i: main.c.i
@@ -165,7 +192,7 @@ main.i: main.c.i
 
 # target to preprocess a source file
 main.c.i:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/main.c.i
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/main.c.i
 .PHONY : main.c.i
 
 main.s: main.c.s
@@ -174,7 +201,7 @@ main.s: main.c.s
 
 # target to generate assembly for a file
 main.c.s:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/main.c.s
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/main.c.s
 .PHONY : main.c.s
 
 utilities.o: utilities.c.o
@@ -183,7 +210,7 @@ utilities.o: utilities.c.o
 
 # target to build an object file
 utilities.c.o:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/utilities.c.o
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/utilities.c.o
 .PHONY : utilities.c.o
 
 utilities.i: utilities.c.i
@@ -192,7 +219,7 @@ utilities.i: utilities.c.i
 
 # target to preprocess a source file
 utilities.c.i:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/utilities.c.i
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/utilities.c.i
 .PHONY : utilities.c.i
 
 utilities.s: utilities.c.s
@@ -201,7 +228,7 @@ utilities.s: utilities.c.s
 
 # target to generate assembly for a file
 utilities.c.s:
-	$(MAKE) -f CMakeFiles/PianoTiles.dir/build.make CMakeFiles/PianoTiles.dir/utilities.c.s
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/utilities.c.s
 .PHONY : utilities.c.s
 
 # Help Target
@@ -212,10 +239,13 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... PianoTiles"
+	@echo "... piano_tiles"
 	@echo "... beatmap.o"
 	@echo "... beatmap.i"
 	@echo "... beatmap.s"
+	@echo "... game.o"
+	@echo "... game.i"
+	@echo "... game.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

@@ -1,4 +1,4 @@
-/usr/lib/clion-2018.2.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /homes/yiz18/Lab/PianoTiles
+/usr/lib/clion-2018.2.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /homes/kx3418/Documents/piano_tiles
 -- Configuring done
 -- Generating done
--- Build files have been written to: /homes/yiz18/Lab/PianoTiles/cmake-build-debug
+-- Build files have been written to: /homes/kx3418/Documents/piano_tiles/cmake-build-debug

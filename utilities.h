@@ -11,8 +11,6 @@
 
 static const uint32_t MAX_SIZE = 65536;
 
-bool load(char *address, beatmap beatmap);
-beat decode_beat(uint8_t i);
+bool load_beatmap(char *address, beatmap beatmap);
 
-void print_beatmap(beatmap beatmap);
 #endif //PIANOTILES_UTILITIES_H
