@@ -15,7 +15,6 @@ int main(int argc, char *argv[]) {
 
     game_t *game = malloc(sizeof(game_t));
     init(game, "Piano Tiles",0, 0, window_width, window_height);
-
     while(game->is_running) {
         load_beatmap(argv[1], map);
         init_beatmap(game, map);

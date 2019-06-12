@@ -18,7 +18,7 @@ typedef enum Beat{
 typedef beat_t *row;
 typedef beat_t **beatmap;
 
-void decode_beat(uint8_t i, row r);
+void decode_beat(int *input, row r);
 
 void print_beatmap(beatmap map);
 #endif //PIANOTILES_BEATMAP_H
