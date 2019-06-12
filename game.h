@@ -17,6 +17,8 @@
 #define col_tile_amount 6
 #define tile_width ((window_width - (row_tile_amount + 1)*row_padding)/row_tile_amount)
 #define tile_height ((window_height - (col_tile_amount + 1)*col_padding)/col_tile_amount)
+#define FPS 60
+#define frame_delay  (1000 / FPS)
 typedef enum GameStatus {
     PLAYING,
     GAME_WON,
@@ -28,6 +30,7 @@ typedef struct game {
     bool is_running;
     gamestatus_t gamestatus;
     bool paused;
+    uint32_t elapsed_beat_time;
     SDL_Window *window;
     SDL_Renderer *renderer;
     beatmap map;
