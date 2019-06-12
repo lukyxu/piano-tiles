@@ -21,6 +21,7 @@
 #define frame_delay  (1000 / FPS)
 typedef enum GameStatus {
     PLAYING,
+    PAUSED,
     GAME_WON,
     GAME_LOST,
     INVALID
@@ -29,11 +30,9 @@ typedef enum GameStatus {
 typedef struct game {
     bool is_running;
     gamestatus_t gamestatus;
-    bool paused;
-    uint32_t elapsed_beat_time;
+    gamemap_t *map;
     SDL_Window *window;
     SDL_Renderer *renderer;
-    gamemap_t *map;
     SDL_Event event;
 } game_t;
 
@@ -41,6 +40,8 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
 
 void init_game(game_t *game, gamemap_t *gamemap);
 void handle_game_events(game_t *game);
+void play_beat(game_t *game, uint32_t column);
+bool handle_game_io(game_t *game);
 void update_game(game_t *game);
 void render_game(game_t *game);
 void delete_game(game_t *game);

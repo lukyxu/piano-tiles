@@ -13,16 +13,10 @@ int main(int argc, char *argv[]) {
         load_gamemap(argv[1], gamemap);
         init_game(game, gamemap);
 
-        for (int i = 0; i < gamemap->total_beats + 5; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                SDL_Log("%d %d %d", i,j, game->map->beatmap[i][j]);
-            }
-        }
-
         uint32_t frame_start = 0;
         uint32_t frame_time = 0;
         while (SDL_PollEvent(&game->event));
-        while(game->gamestatus == PLAYING){
+        while(game->gamestatus == PLAYING || game->gamestatus == PAUSED){
             frame_start = SDL_GetTicks();
 
             handle_game_events(game);
@@ -34,15 +28,13 @@ int main(int argc, char *argv[]) {
             if (frame_delay > frame_time){
                 SDL_Delay(frame_delay - frame_time);
             }
-
-            game->elapsed_beat_time += frame_delay;
-
+            if (game->gamestatus == PLAYING) {
+                game->map->elapsed_beat_time += frame_delay;
+            }
         }
-        SDL_Log("game over");
+        SDL_Log("Game Over");
         SDL_Delay(1000);
     }
-    //play_beatmap(map);
-
     delete_game(game);
     free(game);
 }
