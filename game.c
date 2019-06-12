@@ -26,6 +26,8 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
 void init_game(game_t *game, gamemap_t *gamemap) {
     game->map = gamemap;
     render_game(game);
+    *(game->menu_stack) = NULL;
+//    push(game->menu_stack, MAIN_MENU);
     game->gamestatus = PAUSED;
 }
 
@@ -85,6 +87,9 @@ bool completed_row(const beat_t *row) {
 }
 
 void update_game(game_t *game) {
+    if (stack_empty(*game->menu_stack)){
+        return;
+    }
     if (game->gamestatus == PAUSED) {
         // Wait for input when paused
         if (handle_game_io(game)) {

@@ -8,6 +8,7 @@
 #include "stdbool.h"
 #include "SDL2/SDL.h"
 #include "beatmap.h"
+#include "stack.h"
 
 #define window_width 600
 #define window_height 974
@@ -27,10 +28,18 @@ typedef enum GameStatus {
     INVALID
 } gamestatus_t;
 
+typedef enum Menus{
+    MAIN_MENU,
+    LEADER_BOARD,
+    GAME
+};
+
 typedef struct game {
     bool is_running;
+    bool loaded_gamemap;
     gamestatus_t gamestatus;
     gamemap_t *map;
+    stack *menu_stack;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;

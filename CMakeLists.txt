@@ -10,7 +10,7 @@ add_executable(piano_tiles
         beatmap.h
         main.c
         utilities.c
-        utilities.h game.c game.h)
+        utilities.h game.c game.h stack.c stack.h)
 
 target_link_libraries(piano_tiles ncurses)
 
