@@ -18,6 +18,13 @@ typedef enum Beat{
 typedef beat_t *row;
 typedef beat_t **beatmap;
 
+typedef struct gamemap{
+    beatmap beatmap;
+    uint32_t total_beats;
+    uint32_t completed_rows;
+    uint32_t elapsed_time;
+} gamemap_t;
+
 void decode_beat(int *input, row r);
 
 void print_beatmap(beatmap map);

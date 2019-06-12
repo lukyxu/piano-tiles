@@ -33,14 +33,13 @@ typedef struct game {
     uint32_t elapsed_beat_time;
     SDL_Window *window;
     SDL_Renderer *renderer;
-    beatmap map;
+    gamemap_t *map;
     SDL_Event event;
 } game_t;
 
-void init(game_t *game, const char* title, int xpos, int ypos, int width, int height);
+void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height);
 
-void init_beatmap(game_t *game, beatmap map);
-
+void init_game(game_t *game, gamemap_t *gamemap);
 void handle_game_events(game_t *game);
 void update_game(game_t *game);
 void render_game(game_t *game);

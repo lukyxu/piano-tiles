@@ -13,6 +13,6 @@ static const uint32_t MAX_SIZE = 65536;
 
 void add_padding(beatmap beatmap, int index);
 
-bool load_beatmap(char *address, beatmap beatmap);
+bool load_gamemap(char *address, gamemap_t *gamemap);
 
 #endif //PIANOTILES_UTILITIES_H

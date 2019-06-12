@@ -5,7 +5,7 @@
 #include "game.h"
 
 
-void init(game_t *game, const char *title, int xpos, int ypos, int width, int height) {
+void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         SDL_Log("Game initialized");
         game->window = SDL_CreateWindow(title, xpos, ypos, width, height, false);
@@ -23,8 +23,8 @@ void init(game_t *game, const char *title, int xpos, int ypos, int width, int he
     game->gamestatus = INVALID;
 }
 
-void init_beatmap(game_t *game, beatmap map) {
-    game->map = map;
+void init_game(game_t *game, gamemap_t *gamemap) {
+    game->map = gamemap;
     render_game(game);
     game->gamestatus = PLAYING;
     game->paused = true;
@@ -41,37 +41,37 @@ bool handle_game_io(game_t *game) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_d:
                     SDL_Log("D");
-                    if (!(game->map[0][0] == NOTHING)) {
-                        game->map[0][0] = FINISHED_BEAT;
+                    if (!(game->map->beatmap[0][0] == NOTHING)) {
+                        game->map->beatmap[0][0] = FINISHED_BEAT;
                     } else {
-                        game->map[0][0] = FAILED_BEAT;
+                        game->map->beatmap[0][0] = FAILED_BEAT;
                         game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_f:
                     SDL_Log("F");
-                    if (!(game->map[0][1] == NOTHING)) {
-                        game->map[0][1] = FINISHED_BEAT;
+                    if (!(game->map->beatmap[0][1] == NOTHING)) {
+                        game->map->beatmap[0][1] = FINISHED_BEAT;
                     } else {
-                        game->map[0][1] = FAILED_BEAT;
+                        game->map->beatmap[0][1] = FAILED_BEAT;
                         game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_j:
                     SDL_Log("J");
-                    if (!(game->map[0][2] == NOTHING)) {
-                        game->map[0][2] = FINISHED_BEAT;
+                    if (!(game->map->beatmap[0][2] == NOTHING)) {
+                        game->map->beatmap[0][2] = FINISHED_BEAT;
                     } else {
-                        game->map[0][2] = FAILED_BEAT;
+                        game->map->beatmap[0][2] = FAILED_BEAT;
                         game->gamestatus = GAME_LOST;
                     }
                     return true;
                 case SDLK_k:
                     SDL_Log("K");
-                    if (!(game->map[0][3] == NOTHING)) {
-                        game->map[0][3] = FINISHED_BEAT;
+                    if (!(game->map->beatmap[0][3] == NOTHING)) {
+                        game->map->beatmap[0][3] = FINISHED_BEAT;
                     } else {
-                        game->map[0][3] = FAILED_BEAT;
+                        game->map->beatmap[0][3] = FAILED_BEAT;
                         game->gamestatus = GAME_LOST;
                     }
                     return true;
@@ -94,21 +94,20 @@ void update_game(game_t *game) {
     if (game->paused) {
         // Wait for input when paused
         if (handle_game_io(game)) {
-            if (completed_row(game->map[0])) {
+            if (completed_row(game->map->beatmap[0])) {
                 SDL_Log("completed row");
-                game->map++;
+                game->map->beatmap++;
                 game->paused = false;
                 game->elapsed_beat_time = 0;
-                return;
             }
         }
         return;
     } else {
         if (handle_game_io(game)) {
             SDL_Log("Input");
-            if (completed_row(game->map[0])) {
+            if (completed_row(game->map->beatmap[0])) {
                 SDL_Log("completed row");
-                game->map++;
+                game->map->beatmap++;
                 game->elapsed_beat_time = 0;
                 return;
             }
@@ -118,12 +117,12 @@ void update_game(game_t *game) {
         }
     }
     for (int i = 0; i < row_tile_amount; ++i) {
-        if ((game->map[0][i] == SINGLE_BEAT || game->map[0][i] == HELD_BEAT) &&
+        if ((game->map->beatmap[0][i] == SINGLE_BEAT || game->map->beatmap[0][i] == HELD_BEAT) &&
             game->elapsed_beat_time >= 500) {
             game->gamestatus = GAME_LOST;
             return;
         }
-        if (game->map[0][i] == END) {
+        if (game->map->beatmap[0][i] == END) {
             game->gamestatus = GAME_WON;
         }
     }
@@ -136,7 +135,8 @@ void render_game(game_t *game) {
     for (int j = -1; j < col_tile_amount; ++j) {
 //        for (int j = 0; j < col_tile_amount; ++j) {
         for (int i = 0; i < row_tile_amount; ++i) {
-            switch (game->map[col_tile_amount - (j + 1)][i]) {
+            SDL_Log("%d, %d, %d", col_tile_amount - (j + 1), i, game->map->beatmap[col_tile_amount - (j + 1)][i]);
+            switch (game->map->beatmap[col_tile_amount - (j + 1)][i]) {
                 // 6 - (1:6)
                 case FINISHED_BEAT:
                     SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
