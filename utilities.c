@@ -89,3 +89,11 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
         index++;
     }
 }
+
+int compare_scores(const void* a, const void* b)
+{
+//    const char *ia = (const char *)a;
+//    const char *ib = (const char *)b;
+//    return strcmp(ia, ib);
+    return strtod(a,NULL) < strtod(b,NULL);
+}

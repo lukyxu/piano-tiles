@@ -42,6 +42,7 @@ typedef struct game {
     gamemap_t *map;
     stack *menu_stack;
     menu_option_t menu_pointer;
+
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;

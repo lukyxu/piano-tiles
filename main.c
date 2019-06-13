@@ -32,8 +32,9 @@ void main_menu_loop(game_t *game) {
 }
 
 void leaderboard_loop(game_t *game){
-    update_leaderboard(game);
     render_leaderboard(game);
+    SDL_RenderPresent(game->renderer);
+    while (!update_leaderboard(game));
 };
 
 int main(int argc, char *argv[]) {
@@ -74,9 +75,11 @@ int main(int argc, char *argv[]) {
 
         if (game->gamestatus == GAME_WON || game->gamestatus == GAME_LOST) {
             game->gamestatus = PAUSED;
+            add_leaderboard(game);
             push(game->menu_stack, LEADER_BOARD);
             SDL_Log("Game Over");
             SDL_Delay(1000);
+            while(SDL_PollEvent(&game->event));
         }
 
     }

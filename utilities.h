@@ -25,4 +25,6 @@ bool load_gamemap(char *address, gamemap_t *gamemap);
 
 bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats);
 
+int compare_scores(const void* a, const void* b);
+
 #endif //PIANOTILES_UTILITIES_H

@@ -78,6 +78,7 @@ bool handle_game_io(game_t *game) {
             }
         }
     }
+    return false;
 }
 
 bool completed_row(const beat_t *row) {
@@ -119,7 +120,6 @@ void update_game(game_t *game) {
         set_tiles_speed(game->map,
                         1.0 / FPS * game->map->tiles_acceleration + game->map->tiles_speed);
         // Each second increase by 0.2 tiles
-        //
     }
 
     for (int i = 0; i < row_tile_amount; ++i) {
