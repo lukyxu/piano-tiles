@@ -9,6 +9,7 @@
 #include "SDL2/SDL.h"
 #include "beatmap.h"
 #include "stack.h"
+#include "menus.h"
 
 #define window_width 600
 #define window_height 974
@@ -20,6 +21,7 @@
 #define tile_height ((window_height - (col_tile_amount + 1)*col_padding)/col_tile_amount)
 #define FPS 60
 #define frame_delay  (1000 / FPS)
+
 typedef enum GameStatus {
     PLAYING,
     PAUSED,
@@ -30,17 +32,16 @@ typedef enum GameStatus {
 
 typedef enum Menus{
     MAIN_MENU,
-    LEADER_BOARD,
-    GAME
+    LEADER_BOARD
 }menu_t;
 
 typedef struct game {
     bool is_running;
-    bool loaded_gamemap;
+    bool loaded_beatmap;
     gamestatus_t gamestatus;
     gamemap_t *map;
     stack *menu_stack;
-    uint32_t menu_pointer;
+    menu_option_t menu_pointer;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
@@ -55,4 +56,5 @@ bool handle_game_io(game_t *game);
 void update_game(game_t *game);
 void render_game(game_t *game);
 void delete_game(game_t *game);
+
 #endif //PIANO_TILES_GAME_H

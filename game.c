@@ -30,8 +30,6 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
 void init_game(game_t *game, gamemap_t *gamemap) {
     game->map = gamemap;
     game->menu_pointer = 0;
-    *(game->menu_stack) = NULL;
-    push(game->menu_stack, MAIN_MENU);
     game->gamestatus = PAUSED;
 }
 
@@ -60,25 +58,24 @@ bool handle_game_io(game_t *game) {
         if (game->event.type == SDL_KEYDOWN && game->map->current_row < col_tile_amount) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_d:
-                    SDL_Log("D");
+//                    SDL_Log("D");
                     play_beat(game, 0);
                     return true;
                 case SDLK_f:
-                    SDL_Log("F");
+//                    SDL_Log("F");
                     play_beat(game, 1);
                     return true;
                 case SDLK_j:
-                    SDL_Log("J");
+//                    SDL_Log("J");
                     play_beat(game, 2);
                     return true;
                 case SDLK_k:
-                    SDL_Log("K");
+//                    SDL_Log("K");
                     play_beat(game, 3);
                     return true;
                 default:
                     return false;
             }
-//            }
         }
     }
 }
@@ -94,7 +91,6 @@ void update_game(game_t *game) {
     if (!stack_empty(*game->menu_stack)){
         return;
     }
-    SDL_Log("return");
     if (game->gamestatus == PAUSED) {
         // Wait for input when paused
         if (handle_game_io(game)) {
@@ -170,7 +166,6 @@ void render_game(game_t *game) {
                 default:
                     SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
             }
-//            if (j < (col_tile_amount + 1) - game->map->current_row){
             if (j == -1 || j == 0) {
                 if (game->gamestatus
                     == GAME_WON) {
@@ -192,6 +187,8 @@ void render_game(game_t *game) {
     sprintf(buffer, "%-.2f", game->map->tiles_speed);
     draw_text(game, buffer, ROUGH, (SDL_Color){200,0,0},(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
 }
+
+
 
 void delete_game(game_t *game) {
     SDL_DestroyWindow(game->window);

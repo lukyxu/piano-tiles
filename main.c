@@ -31,20 +31,26 @@ void main_menu_loop(game_t *game) {
     render_main_menu(game);
 }
 
+void leaderboard_loop(game_t *game){
+    update_leaderboard(game);
+    render_leaderboard(game);
+};
+
 int main(int argc, char *argv[]) {
     gamemap_t *gamemap = malloc(sizeof(gamemap_t));
     game_t *game = malloc(sizeof(game_t));
     game->menu_stack = malloc(sizeof(stack));
-    game->loaded_gamemap = false;
+    *(game->menu_stack) = NULL;
+    push(game->menu_stack, MAIN_MENU);
+    game->loaded_beatmap = false;
 
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
     while (game->is_running) {
         //initialize gamemap
-        if (game->loaded_gamemap == false) {
+        if (!game->loaded_beatmap) {
             load_gamemap(argv[1], gamemap);
             init_game(game, gamemap);
-            game->loaded_gamemap = true;
-            while (SDL_PollEvent(&game->event));
+            game->loaded_beatmap = true;
         }
 
         game_loop(game);
@@ -55,6 +61,7 @@ int main(int argc, char *argv[]) {
                     main_menu_loop(game);
                     break;
                 case LEADER_BOARD:
+                    leaderboard_loop(game);
                     break;
                 default:
                     break;
@@ -67,7 +74,7 @@ int main(int argc, char *argv[]) {
 
         if (game->gamestatus == GAME_WON || game->gamestatus == GAME_LOST) {
             game->gamestatus = PAUSED;
-            game->loaded_gamemap = false;
+            push(game->menu_stack, LEADER_BOARD);
             SDL_Log("Game Over");
             SDL_Delay(1000);
         }
