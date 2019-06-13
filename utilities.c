@@ -3,9 +3,23 @@
 //
 
 #include "utilities.h"
+
 #include <stdlib.h>
 #include <string.h>
-#define PADDING 10
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+
+void draw_text(game_t *game, char *str, uint32_t font_size, SDL_Color colour, SDL_Rect rect){
+    static TTF_Font *font = NULL;
+    if (!font){
+         font =  TTF_OpenFont("Sans.ttf", font_size);
+    }
+    SDL_Surface *surface_message = TTF_RenderText_Solid(font, str, colour);
+    SDL_Texture *message = SDL_CreateTextureFromSurface(game->renderer, surface_message);
+    free(surface_message);
+    SDL_RenderCopy(game->renderer, message, NULL, &rect);
+}
 
 void add_padding(beatmap beatmap, int index) {
     for (int i = 1; i < PADDING; ++i) {

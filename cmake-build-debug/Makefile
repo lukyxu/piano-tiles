@@ -204,6 +204,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/main.c.s
 .PHONY : main.c.s
 
+menus.o: menus.c.o
+
+.PHONY : menus.o
+
+# target to build an object file
+menus.c.o:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/menus.c.o
+.PHONY : menus.c.o
+
+menus.i: menus.c.i
+
+.PHONY : menus.i
+
+# target to preprocess a source file
+menus.c.i:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/menus.c.i
+.PHONY : menus.c.i
+
+menus.s: menus.c.s
+
+.PHONY : menus.s
+
+# target to generate assembly for a file
+menus.c.s:
+	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/menus.c.s
+.PHONY : menus.c.s
+
 stack.o: stack.c.o
 
 .PHONY : stack.o
@@ -276,6 +303,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... menus.o"
+	@echo "... menus.i"
+	@echo "... menus.s"
 	@echo "... stack.o"
 	@echo "... stack.i"
 	@echo "... stack.s"

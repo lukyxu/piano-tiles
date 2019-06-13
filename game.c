@@ -3,11 +3,14 @@
 //
 
 #include "game.h"
+#include "utilities.h"
+#include <SDL2/SDL_ttf.h>
 
 
 void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         SDL_Log("Game initialized");
+        TTF_Init();
         game->window = SDL_CreateWindow(title, xpos, ypos, width, height, false);
         if (game->window) {
             SDL_Log("Window created");
@@ -17,6 +20,7 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
             SDL_Log("Renderer created");
         }
         game->is_running = true;
+
     } else {
         game->is_running = false;
     }
@@ -25,9 +29,9 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
 
 void init_game(game_t *game, gamemap_t *gamemap) {
     game->map = gamemap;
-    render_game(game);
+    game->menu_pointer = 0;
     *(game->menu_stack) = NULL;
-//    push(game->menu_stack, MAIN_MENU);
+    push(game->menu_stack, MAIN_MENU);
     game->gamestatus = PAUSED;
 }
 
@@ -56,19 +60,19 @@ bool handle_game_io(game_t *game) {
         if (game->event.type == SDL_KEYDOWN && game->map->current_row < col_tile_amount) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_d:
-//                    SDL_Log("D");
+                    SDL_Log("D");
                     play_beat(game, 0);
                     return true;
                 case SDLK_f:
-//                    SDL_Log("F");
+                    SDL_Log("F");
                     play_beat(game, 1);
                     return true;
                 case SDLK_j:
-//                    SDL_Log("J");
+                    SDL_Log("J");
                     play_beat(game, 2);
                     return true;
                 case SDLK_k:
-//                    SDL_Log("K");
+                    SDL_Log("K");
                     play_beat(game, 3);
                     return true;
                 default:
@@ -87,9 +91,10 @@ bool completed_row(const beat_t *row) {
 }
 
 void update_game(game_t *game) {
-    if (stack_empty(*game->menu_stack)){
+    if (!stack_empty(*game->menu_stack)){
         return;
     }
+    SDL_Log("return");
     if (game->gamestatus == PAUSED) {
         // Wait for input when paused
         if (handle_game_io(game)) {
@@ -183,7 +188,9 @@ void render_game(game_t *game) {
                                                             tile_width, tile_height});
         }
     }
-    SDL_RenderPresent(game->renderer);
+    char buffer[10];
+    sprintf(buffer, "%-.2f", game->map->tiles_speed);
+    draw_text(game, buffer, ROUGH, (SDL_Color){200,0,0},(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
 }
 
 void delete_game(game_t *game) {

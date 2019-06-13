@@ -9,9 +9,15 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "beatmap.h"
+#include "game.h"
 
+#define PADDING 10
+#define SMOOTH 100
+#define ROUGH 24
 
 static const uint32_t MAX_SIZE = 65536;
+
+void draw_text(game_t *game, char *str, uint32_t font_size,SDL_Color colour, SDL_Rect rect);
 
 void add_padding(beatmap beatmap, int index);
 

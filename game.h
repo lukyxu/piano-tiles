@@ -32,7 +32,7 @@ typedef enum Menus{
     MAIN_MENU,
     LEADER_BOARD,
     GAME
-};
+}menu_t;
 
 typedef struct game {
     bool is_running;
@@ -40,6 +40,7 @@ typedef struct game {
     gamestatus_t gamestatus;
     gamemap_t *map;
     stack *menu_stack;
+    uint32_t menu_pointer;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
