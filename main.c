@@ -39,6 +39,7 @@ void main_menu_loop(game_t *game) {
 void leaderboard_loop(game_t *game){
     draw_leaderboard(game);
     SDL_RenderPresent(game->renderer);
+    // Loops until a valid input is received
     while (!update_leaderboard(game));
 };
 
@@ -50,8 +51,8 @@ int main(int argc, char *argv[]) {
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
 
     while (game->is_running) {
-        //initialize gamemap
         if (!game->loaded_beatmap) {
+            // Initializes gamemap
             load_gamemap(argv[1], gamemap);
             init_gamemap(game, gamemap);
             load_audio(game);
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
         game_loop(game);
 
         if (!stack_empty(*game->menu_stack)) {
+            // Overlays menu on game if a menu is on the menu stack
             Mix_HaltMusic();
             switch (peek(*game->menu_stack)) {
                 case MAIN_MENU:
@@ -74,11 +76,13 @@ int main(int argc, char *argv[]) {
             }
             SDL_RenderPresent(game->renderer);
             continue;
-        }else{
-            SDL_RenderPresent(game->renderer);
         }
 
+        SDL_RenderPresent(game->renderer);
+
+        // Stack is empty so game is in progress or over
         if (game->gamestatus == GAME_WON || game->gamestatus == GAME_LOST) {
+            // Game is won/lost
             game->gamestatus = PAUSED;
             add_leaderboard(game);
             push(game->menu_stack, LEADER_BOARD);
@@ -86,8 +90,9 @@ int main(int argc, char *argv[]) {
             SDL_Delay(1000);
             while(SDL_PollEvent(&game->event));
         }
-
     }
+
+    // Game is over
     free_audio(game);
     delete_game(game);
     return EXIT_SUCCESS;

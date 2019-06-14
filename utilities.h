@@ -8,12 +8,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "gamemap.h"
 #include "game.h"
 
 #define PADDING 10
 #define SMOOTH 100
 #define ROUGH 24
+#define BLACK ((SDL_Color) {0, 0, 0})
+#define WHITE ((SDL_Color) {255, 255, 255})
+#define RED ((SDL_Color) {255, 0, 0})
+#define DARK_RED ((SDL_Color) {255, 0, 0})
 
 static const uint32_t MAX_SIZE = 65536;
 

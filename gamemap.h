@@ -7,17 +7,17 @@
 
 
 #include <stdint.h>
-typedef enum Beat{
+typedef enum Tile{
     NOTHING = 0,
     SINGLE_BEAT = 1,
     HELD_BEAT = 2,
     END = 3,
     FINISHED_BEAT = 4,
     FAILED_BEAT = 5
-} beat_t;
+} tile_t;
 
-typedef beat_t *row;
-typedef beat_t **beatmap;
+typedef tile_t *row;
+typedef tile_t **beatmap;
 
 typedef struct gamemap{
     beatmap beatmap;
@@ -31,10 +31,10 @@ typedef struct gamemap{
     uint32_t elapsed_beat_time;
 } gamemap_t;
 
-static inline void set_tile_period_buffer(gamemap_t *gamemap, uint32_t period){
-    gamemap->tile_period_buffer = period;
-    gamemap->tiles_speed = 1000/gamemap->tile_period_buffer;
-}
+//static inline void set_tile_period_buffer(gamemap_t *gamemap, uint32_t period){
+//    gamemap->tile_period_buffer = period;
+//    gamemap->tiles_speed = 1000/gamemap->tile_period_buffer;
+//}
 
 static inline void set_tiles_speed(gamemap_t *gamemap, double TPS){
     gamemap->tiles_speed = TPS;

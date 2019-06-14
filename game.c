@@ -38,12 +38,14 @@ void init_gamemap(game_t *game, gamemap_t *gamemap) {
 void play_beat(game_t *game, uint32_t column){
     switch (game->map->beatmap[game->map->current_row][column]){
         case NOTHING:
+            // Game is lost if tapped tile of the current row is nothing
             game->map->beatmap[game->map->current_row][column] = FAILED_BEAT;
             Mix_PlayChannel(-1, game->audio->fail, 0);
             Mix_HaltMusic();
             game->gamestatus = GAME_LOST;
             break;
         case FINISHED_BEAT:
+            // Game is lost if tapped tile of current row tile is finished
             game->map->beatmap[game->map->current_row + 1][column] = FAILED_BEAT;
             Mix_PlayChannel(-1, game->audio->fail, 0);
             Mix_HaltMusic();
@@ -55,24 +57,21 @@ void play_beat(game_t *game, uint32_t column){
     }
 }
 
+// Returns true iff a valid input is received
 bool handle_game_io(game_t *game) {
     while (SDL_PollEvent(&game->event)) {
         if (game->event.type == SDL_KEYDOWN && game->map->current_row < col_tile_amount) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_d:
-//                    SDL_Log("D");
                     play_beat(game, 0);
                     return true;
                 case SDLK_f:
-//                    SDL_Log("F");
                     play_beat(game, 1);
                     return true;
                 case SDLK_j:
-//                    SDL_Log("J");
                     play_beat(game, 2);
                     return true;
                 case SDLK_k:
-//                    SDL_Log("K");
                     play_beat(game, 3);
                     return true;
                 default:
@@ -83,7 +82,8 @@ bool handle_game_io(game_t *game) {
     return false;
 }
 
-bool completed_row(const beat_t *row) {
+// Returns true iff the row is completed
+bool completed_row(const tile_t *row) {
     return ((row[0] == NOTHING || row[0] == FINISHED_BEAT) &&
             (row[1] == NOTHING || row[1] == FINISHED_BEAT) &&
             (row[2] == NOTHING || row[2] == FINISHED_BEAT) &&
@@ -97,9 +97,13 @@ void update_game(game_t *game) {
     if (game->gamestatus == PAUSED) {
         // Wait for input when paused
         if (handle_game_io(game)) {
-            if (completed_row(game->map->beatmap[game->map->current_row])) {
-//                SDL_Log("completed row");
+            if (!Mix_PlayingMusic() && (game->gamestatus != GAME_LOST &&
+            game->gamestatus != GAME_WON)) {
+                // Plays music when a valid input is first pressed and game is not over
                 Mix_PlayMusic(game->audio->music, -1);
+            }
+            if (completed_row(game->map->beatmap[game->map->current_row])) {
+                // Unpauses the game
                 game->map->completed_rows++;
                 game->map->current_row++;
                 game->gamestatus = PLAYING;
@@ -109,9 +113,7 @@ void update_game(game_t *game) {
         return;
     } else {
         if (handle_game_io(game)) {
-//            SDL_Log("Input");
             if (completed_row(game->map->beatmap[game->map->current_row])) {
-//                SDL_Log("completed row");
                 game->map->completed_rows++;
                 game->map->current_row++;
             }
@@ -119,19 +121,21 @@ void update_game(game_t *game) {
         if (!(game->gamestatus == PLAYING)) {
             return;
         }
-
+        // Increases speed of tiles each second by tiles_acceleration
         set_tiles_speed(game->map,
                         1.0 / FPS * game->map->tiles_acceleration + game->map->tiles_speed);
     }
 
     for (int i = 0; i < row_tile_amount; ++i) {
         if (game->map->beatmap[game->map->current_row][i] == END) {
+            // Game is won when the current row reaches the end
             game->gamestatus = GAME_WON;
             return;
         }
 
         if ((game->map->beatmap[0][i] == SINGLE_BEAT || game->map->beatmap[0][i] == HELD_BEAT) &&
             game->map->elapsed_beat_time >= game->map->tile_period) {
+            // Game is lost as a tile is not tapped and goes out of the window
             Mix_PlayChannel(-1, game->audio->fail, 0);
             Mix_HaltMusic();
             game->gamestatus = GAME_LOST;
@@ -139,16 +143,20 @@ void update_game(game_t *game) {
         }
     }
     if (game->map->elapsed_beat_time >= game->map->tile_period) {
+        // Tile goes out of the window
         game->map->beatmap++;
         game->map->elapsed_beat_time = 0;
         game->map->current_row--;
+        // Buffer is used to smooth rendering as rendering is dependent on tile period
         game->map->tile_period = game->map->tile_period_buffer;
     }
 }
 
 void draw_game(game_t *game) {
+    // Draws the background colour
     SDL_SetRenderDrawColor(game->renderer, 100, 100, 100, 255);
     SDL_RenderClear(game->renderer);
+    // Draws all the tiles
     for (int j = -1; j < col_tile_amount; ++j) {
         for (int i = 0; i < row_tile_amount; ++i) {
             switch (game->map->beatmap[col_tile_amount - (j + 1)][i]) {
@@ -169,8 +177,7 @@ void draw_game(game_t *game) {
                     SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
             }
             if (j == -1 || j == 0) {
-                if (game->gamestatus
-                    == GAME_WON) {
+                if (game->gamestatus == GAME_WON) {
                     SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
                 } else if (game->gamestatus == GAME_LOST) {
                     SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
@@ -185,9 +192,10 @@ void draw_game(game_t *game) {
                                                             tile_width, tile_height});
         }
     }
+    // Draw the tiles per second indicator
     char buffer[10];
     sprintf(buffer, "%-.2f", game->map->tiles_speed);
-    draw_text(game, buffer, ROUGH, (SDL_Color){200,0,0},(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
+    draw_text(game, buffer, ROUGH, DARK_RED ,(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
 }
 
 void delete_game(game_t *game) {
@@ -204,34 +212,33 @@ void delete_game(game_t *game) {
 bool load_audio(game_t *game){
     game->audio->music = Mix_LoadMUS(MUS_PATH);
 
-    //If there was a problem loading the music
+    // If there was a problem loading the music
     if (game->audio->music == NULL) {
         return false;
     }
 
-    //Load the sound effect
+    // Load the sound effect
     game->audio->fail = Mix_LoadWAV(FAIL_EFFECT_PATH);
 
-    //If there was a problem loading the fail sound effect
+    // If there was a problem loading the fail sound effect
     if (game->audio->fail == NULL) {
         SDL_Log("Could not open test.wav: %s\n", Mix_GetError());
         return false;
     }
 
-    //If everything loaded fine
     return true;
 }
 
 void free_audio(game_t *game) {
-    //Free the sound effects
+    // Free the sound effects
     Mix_FreeChunk(game->audio->fail);
 
-    //Free the music
+    // Free the music
     Mix_FreeMusic(game->audio->music);
 
-    //Quit SDL_mixer
+    // Quit SDL_mixer
     Mix_CloseAudio();
 
-    //Quit SDL
+    // Quit SDL
     SDL_Quit();
 }

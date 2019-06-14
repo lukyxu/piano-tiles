@@ -6,8 +6,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 
 void draw_text(game_t *game, char *str, uint32_t font_size, SDL_Color colour, SDL_Rect rect){
@@ -23,10 +21,11 @@ void draw_text(game_t *game, char *str, uint32_t font_size, SDL_Color colour, SD
 
 void add_padding(beatmap beatmap, int index) {
     for (int i = 1; i < PADDING; ++i) {
-        beatmap[index + i] = calloc(4, sizeof(beat_t));
+        beatmap[index + i] = calloc(4, sizeof(tile_t));
     }
 }
 
+// Returns true iff the gamemap is loaded sucessfully
 bool load_gamemap(char *address, gamemap_t *gamemap) {
     FILE *fp = fopen(address, "r");
     if (fp == NULL){
@@ -61,10 +60,11 @@ bool load_gamemap(char *address, gamemap_t *gamemap) {
     gamemap->beatmap = beatmap;
 }
 
+// Returns true iff the beatmap is loaded successfully
 bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
     uint32_t index = 0;
     while(true){
-        beatmap[index] = calloc(4, sizeof(beat_t));
+        beatmap[index] = calloc(4, sizeof(tile_t));
         for (int i = 0; i < 4; ++i) {
             int read_char = fgetc(fp);
             if(read_char == '\n'){
@@ -77,6 +77,7 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
                 beatmap[index][2] = 3;
                 beatmap[index][3] = 3;
                 *total_beats = index;
+                // Add padding to allow indexes to be read after the game end
                 add_padding(beatmap, index);
                 return true;
             }
@@ -92,8 +93,5 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
 
 int compare_scores(const void* a, const void* b)
 {
-//    const char *ia = (const char *)a;
-//    const char *ib = (const char *)b;
-//    return strcmp(ia, ib);
     return strtod(a,NULL) < strtod(b,NULL);
 }

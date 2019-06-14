@@ -17,6 +17,7 @@ typedef stack_node_t *stack;
 stack_node_t *new_node(int data);
 
 bool stack_empty(stack root);
+
 void push(stack *root, int data);
 
 int pop(stack *root);

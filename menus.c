@@ -10,6 +10,7 @@ bool update_leaderboard(game_t *game) {
         if (game->event.type == SDL_KEYDOWN) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_k:
+                    // Sets next menu is main menu
                     pop(game->menu_stack);
                     push(game->menu_stack, MAIN_MENU);
                     return true;
@@ -26,6 +27,8 @@ void add_leaderboard(game_t *game) {
     if (fp == NULL) {
         exit(EXIT_FAILURE);
     }
+
+    // Appends the relevant scores to the leader board file
     switch (game->menu_pointer) {
         case CLASSIC:
             fwrite("CLASSIC: ", 1, sizeof("CLASSIC: ") - 1, fp);
@@ -38,9 +41,12 @@ void add_leaderboard(game_t *game) {
 }
 
 void draw_leaderboard(game_t *game) {
+    // Draws the background
     SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
     SDL_RenderClear(game->renderer);
-    draw_text(game, "LEADER BOARD", ROUGH, (SDL_Color) {0, 0, 0}, (SDL_Rect) {window_width / 16, 0,
+
+    // Draws the leaderboard header
+    draw_text(game, "LEADER BOARD", ROUGH, BLACK, (SDL_Rect) {window_width / 16, 0,
                                                                               (7 * window_width /
                                                                                8),
                                                                               window_height / 5});
@@ -67,7 +73,7 @@ void draw_leaderboard(game_t *game) {
         }
     }
     sprintf(buffer, "%-.2f", game->map->tiles_speed);
-    draw_text(game, buffer, ROUGH, (SDL_Color) {200, 0, 0},
+    draw_text(game, buffer, ROUGH, DARK_RED,
               (SDL_Rect) {window_width / 4, window_height / 8, window_width / 2,
                           window_height / 5});
     qsort(scores, (size_t) i, sizeof(char) * 10, &compare_scores);
@@ -93,26 +99,26 @@ void draw_leaderboard(game_t *game) {
             scores[j][strlen(scores[j]) - 1] = '\0';
         }
         if (j < max_col1) {
-            // Draws the index
-            draw_text(game, buffer, ROUGH, (SDL_Color) {0, 0, 0},
+            // Draws the left index
+            draw_text(game, buffer, ROUGH, BLACK,
                       (SDL_Rect) {window_width / 20,
                                   3 * window_height / 10 + j * window_height / 10,
                                   window_width / 10,
                                   window_height / 10});
-            // Draws the score
-            draw_text(game, scores[j], ROUGH, (SDL_Color) {0, 0, 0},
+            // Draws the left score
+            draw_text(game, scores[j], ROUGH, BLACK,
                       (SDL_Rect) {1 * window_width / 4,
                                   3 * window_height / 10 + j * window_height / 10, window_width / 4,
                                   window_height / 10});
         } else if (j < 2 * max_col1) {
-            // Draws the index
-            draw_text(game, buffer, ROUGH, (SDL_Color) {0, 0, 0},
+            // Draws the right index
+            draw_text(game, buffer, ROUGH, BLACK,
                       (SDL_Rect) {1 * window_width / 2 + window_width / 20,
                                   3 * window_height / 10 + (j - max_col1) * window_height / 10,
                                   window_width / 10,
                                   window_height / 10});
-            // Draws the score
-            draw_text(game, scores[j], ROUGH, (SDL_Color) {0, 0, 0},
+            // Draws the right score
+            draw_text(game, scores[j], ROUGH, BLACK,
                       (SDL_Rect) {3 * window_width / 4,
                                   3 * window_height / 10 + (j - max_col1) * window_height / 10,
                                   window_width / 4, window_height / 10});
@@ -132,7 +138,7 @@ void draw_main_menu(game_t *game) {
 
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
     // 100 400
-    draw_text(game, "Piano Tiles", ROUGH, (SDL_Color) {0, 0, 0},
+    draw_text(game, "Piano Tiles", ROUGH, BLACK,
               (SDL_Rect) {window_width / 6, window_height / 30,
                           (int) (window_width / 1.5), window_height / 5});
     SDL_RenderFillRect(game->renderer,
@@ -142,50 +148,50 @@ void draw_main_menu(game_t *game) {
                        &(SDL_Rect) {window_width / 2, (window_height - window_width / 2),
                                     window_width / 2, window_width / 2});
 
-    // Top left
-    draw_text(game, "Classic", SMOOTH, (SDL_Color) {255, 255, 255},
+    // Top left option
+    draw_text(game, "Classic", SMOOTH, WHITE,
               (SDL_Rect) {window_width / 16, window_height - window_width + (window_width / 8),
                           (3 * window_width) / 8, (window_width / 4)});
-    // Top right
-    draw_text(game, "-------", SMOOTH, (SDL_Color) {0, 0, 0},
+    // Top right option
+    draw_text(game, "-------", SMOOTH, BLACK,
               (SDL_Rect) {window_width / 16 + window_width / 2,
                           window_height - window_width + (window_width / 8), (3 * window_width) / 8,
                           (window_width / 4)});
-    // Bottom left
-    draw_text(game, "-------", SMOOTH, (SDL_Color) {0, 0, 0}, (SDL_Rect) {window_width / 16,
+    // Bottom left option
+    draw_text(game, "-------", SMOOTH, BLACK, (SDL_Rect) {window_width / 16,
                                                                           window_height -
                                                                           window_width +
                                                                           (window_width / 8) +
                                                                           (window_width / 2),
                                                                           (3 * window_width) / 8,
                                                                           (window_width / 4)});
-    // Bottom right
-    draw_text(game, "-------", SMOOTH, (SDL_Color) {255, 255, 255},
+    // Bottom right option
+    draw_text(game, "-------", SMOOTH, WHITE,
               (SDL_Rect) {window_width / 16 + window_width / 2,
                           window_height - window_width + (window_width / 8) + (window_width / 2),
                           (3 * window_width) / 8, (window_width / 4)});
 
     switch (game->menu_pointer) {
         case CLASSIC:
-            draw_text(game, "Classic", SMOOTH, (SDL_Color) {255, 0, 0},
+            draw_text(game, "Classic", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16,
                                   window_height - window_width + (window_width / 8),
                                   (3 * window_width) / 8, (window_width / 4)});
             break;
         case TBC:
-            draw_text(game, "-------", SMOOTH, (SDL_Color) {255, 0, 0},
+            draw_text(game, "-------", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16 + window_width / 2,
                                   window_height - window_width + (window_width / 8),
                                   (3 * window_width) / 8, (window_width / 4)});
             break;
         case TBC1:
-            draw_text(game, "-------", SMOOTH, (SDL_Color) {255, 0, 0},
+            draw_text(game, "-------", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16,
                                   window_height - window_width + (window_width / 8) +
                                   (window_width / 2), (3 * window_width) / 8, (window_width / 4)});
             break;
         case TBC2:
-            draw_text(game, "-------", SMOOTH, (SDL_Color) {255, 0, 0},
+            draw_text(game, "-------", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16 + window_width / 2,
                                   window_height - window_width + (window_width / 8) +
                                   (window_width / 2), (3 * window_width) / 8, (window_width / 4)});

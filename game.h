@@ -59,7 +59,6 @@ typedef struct game {
 
 void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height);
 void init_gamemap(game_t *game, gamemap_t *gamemap);
-void handle_game_events(game_t *game);
 void play_beat(game_t *game, uint32_t column);
 bool handle_game_io(game_t *game);
 void update_game(game_t *game);
