@@ -2,20 +2,25 @@
 #include <stdlib.h>
 #include <time.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "utilities.h"
 #include "game.h"
 #include "stack.h"
 #include "menus.h"
 
+void init_game(game_t *game) {
+    game->menu_stack = malloc(sizeof(stack));
+    *(game->menu_stack) = NULL;
+    push(game->menu_stack, MAIN_MENU);
+    game->loaded_beatmap = false;
+    game->audio = malloc(sizeof(audio_files_t));
+}
 
 void game_loop(game_t *game) {
     uint32_t frame_start = SDL_GetTicks();
-
-//    handle_game_events(game);
     update_game(game);
-    render_game(game);
-
+    draw_game(game);
     uint32_t frame_time = SDL_GetTicks() - frame_start;
 
     if (frame_delay > frame_time) {
@@ -28,11 +33,11 @@ void game_loop(game_t *game) {
 
 void main_menu_loop(game_t *game) {
     update_main_menu(game);
-    render_main_menu(game);
+    draw_main_menu(game);
 }
 
 void leaderboard_loop(game_t *game){
-    render_leaderboard(game);
+    draw_leaderboard(game);
     SDL_RenderPresent(game->renderer);
     while (!update_leaderboard(game));
 };
@@ -40,23 +45,23 @@ void leaderboard_loop(game_t *game){
 int main(int argc, char *argv[]) {
     gamemap_t *gamemap = malloc(sizeof(gamemap_t));
     game_t *game = malloc(sizeof(game_t));
-    game->menu_stack = malloc(sizeof(stack));
-    *(game->menu_stack) = NULL;
-    push(game->menu_stack, MAIN_MENU);
-    game->loaded_beatmap = false;
+    init_game(game);
 
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
+
     while (game->is_running) {
         //initialize gamemap
         if (!game->loaded_beatmap) {
             load_gamemap(argv[1], gamemap);
-            init_game(game, gamemap);
+            init_gamemap(game, gamemap);
+            load_audio(game);
             game->loaded_beatmap = true;
         }
 
         game_loop(game);
 
         if (!stack_empty(*game->menu_stack)) {
+            Mix_HaltMusic();
             switch (peek(*game->menu_stack)) {
                 case MAIN_MENU:
                     main_menu_loop(game);
@@ -83,6 +88,9 @@ int main(int argc, char *argv[]) {
         }
 
     }
+    free_audio(game);
     delete_game(game);
-    free(game);
+    return EXIT_SUCCESS;
 }
+
+

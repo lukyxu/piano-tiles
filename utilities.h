@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "beatmap.h"
+#include "gamemap.h"
 #include "game.h"
 
 #define PADDING 10

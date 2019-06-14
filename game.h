@@ -5,9 +5,10 @@
 #ifndef PIANO_TILES_GAME_H
 #define PIANO_TILES_GAME_H
 
+#include <SDL2/SDL_mixer.h>
 #include "stdbool.h"
 #include "SDL2/SDL.h"
-#include "beatmap.h"
+#include "gamemap.h"
 #include "stack.h"
 #include "menus.h"
 
@@ -22,18 +23,25 @@
 #define FPS 60
 #define frame_delay  (1000 / FPS)
 
+#define MUS_PATH "test.wav"
+#define FAIL_EFFECT_PATH "fail.wav"
+
 typedef enum GameStatus {
     PLAYING,
     PAUSED,
     GAME_WON,
     GAME_LOST,
-    INVALID
 } gamestatus_t;
 
 typedef enum Menus{
     MAIN_MENU,
     LEADER_BOARD
 }menu_t;
+
+typedef struct audio_files{
+    Mix_Music *music;
+    Mix_Chunk *fail;
+}audio_files_t;
 
 typedef struct game {
     bool is_running;
@@ -42,20 +50,21 @@ typedef struct game {
     gamemap_t *map;
     stack *menu_stack;
     menu_option_t menu_pointer;
-
+    audio_files_t *audio;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
 } game_t;
 
-void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height);
 
-void init_game(game_t *game, gamemap_t *gamemap);
+void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height);
+void init_gamemap(game_t *game, gamemap_t *gamemap);
 void handle_game_events(game_t *game);
 void play_beat(game_t *game, uint32_t column);
 bool handle_game_io(game_t *game);
 void update_game(game_t *game);
-void render_game(game_t *game);
+void draw_game(game_t *game);
 void delete_game(game_t *game);
-
+bool load_audio(game_t *game);
+void free_audio(game_t *game);
 #endif //PIANO_TILES_GAME_H

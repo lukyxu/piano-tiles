@@ -123,33 +123,6 @@ piano_tiles/fast:
 	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/build
 .PHONY : piano_tiles/fast
 
-beatmap.o: beatmap.c.o
-
-.PHONY : beatmap.o
-
-# target to build an object file
-beatmap.c.o:
-	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.o
-.PHONY : beatmap.c.o
-
-beatmap.i: beatmap.c.i
-
-.PHONY : beatmap.i
-
-# target to preprocess a source file
-beatmap.c.i:
-	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.i
-.PHONY : beatmap.c.i
-
-beatmap.s: beatmap.c.s
-
-.PHONY : beatmap.s
-
-# target to generate assembly for a file
-beatmap.c.s:
-	$(MAKE) -f CMakeFiles/piano_tiles.dir/build.make CMakeFiles/piano_tiles.dir/beatmap.c.s
-.PHONY : beatmap.c.s
-
 game.o: game.c.o
 
 .PHONY : game.o
@@ -294,9 +267,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... piano_tiles"
-	@echo "... beatmap.o"
-	@echo "... beatmap.i"
-	@echo "... beatmap.s"
 	@echo "... game.o"
 	@echo "... game.i"
 	@echo "... game.s"

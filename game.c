@@ -6,7 +6,6 @@
 #include "utilities.h"
 #include <SDL2/SDL_ttf.h>
 
-
 void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height) {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         SDL_Log("Game initialized");
@@ -19,32 +18,35 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
         if (game->renderer) {
             SDL_Log("Renderer created");
         }
+        if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
+            SDL_Log("Music Error %s",Mix_GetError());
+        }
         game->is_running = true;
-
     } else {
         game->is_running = false;
     }
-    game->gamestatus = INVALID;
 }
 
-void init_game(game_t *game, gamemap_t *gamemap) {
+void init_gamemap(game_t *game, gamemap_t *gamemap) {
     game->map = gamemap;
     game->menu_pointer = 0;
     game->gamestatus = PAUSED;
-}
-
-void handle_game_events(game_t *game) {
-
+    game->audio->music = NULL;
+    game->audio->fail = NULL;
 }
 
 void play_beat(game_t *game, uint32_t column){
     switch (game->map->beatmap[game->map->current_row][column]){
         case NOTHING:
             game->map->beatmap[game->map->current_row][column] = FAILED_BEAT;
+            Mix_PlayChannel(-1, game->audio->fail, 0);
+            Mix_HaltMusic();
             game->gamestatus = GAME_LOST;
             break;
         case FINISHED_BEAT:
             game->map->beatmap[game->map->current_row + 1][column] = FAILED_BEAT;
+            Mix_PlayChannel(-1, game->audio->fail, 0);
+            Mix_HaltMusic();
             game->gamestatus = GAME_LOST;
             break;
         default:
@@ -97,6 +99,7 @@ void update_game(game_t *game) {
         if (handle_game_io(game)) {
             if (completed_row(game->map->beatmap[game->map->current_row])) {
 //                SDL_Log("completed row");
+                Mix_PlayMusic(game->audio->music, -1);
                 game->map->completed_rows++;
                 game->map->current_row++;
                 game->gamestatus = PLAYING;
@@ -119,7 +122,6 @@ void update_game(game_t *game) {
 
         set_tiles_speed(game->map,
                         1.0 / FPS * game->map->tiles_acceleration + game->map->tiles_speed);
-        // Each second increase by 0.2 tiles
     }
 
     for (int i = 0; i < row_tile_amount; ++i) {
@@ -130,6 +132,8 @@ void update_game(game_t *game) {
 
         if ((game->map->beatmap[0][i] == SINGLE_BEAT || game->map->beatmap[0][i] == HELD_BEAT) &&
             game->map->elapsed_beat_time >= game->map->tile_period) {
+            Mix_PlayChannel(-1, game->audio->fail, 0);
+            Mix_HaltMusic();
             game->gamestatus = GAME_LOST;
             return;
         }
@@ -142,14 +146,12 @@ void update_game(game_t *game) {
     }
 }
 
-void render_game(game_t *game) {
+void draw_game(game_t *game) {
     SDL_SetRenderDrawColor(game->renderer, 100, 100, 100, 255);
     SDL_RenderClear(game->renderer);
     for (int j = -1; j < col_tile_amount; ++j) {
-//        for (int j = 0; j < col_tile_amount; ++j) {
         for (int i = 0; i < row_tile_amount; ++i) {
             switch (game->map->beatmap[col_tile_amount - (j + 1)][i]) {
-                // 6 - (1:6)
                 case FINISHED_BEAT:
                     SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
                     break;
@@ -188,11 +190,48 @@ void render_game(game_t *game) {
     draw_text(game, buffer, ROUGH, (SDL_Color){200,0,0},(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
 }
 
-
-
 void delete_game(game_t *game) {
     SDL_DestroyWindow(game->window);
     SDL_DestroyRenderer(game->renderer);
     SDL_Quit();
+    free(game->audio);
+    free(game->map);
+    free(game->menu_stack);
     SDL_Log("Game Exited");
+    free(game);
+}
+
+bool load_audio(game_t *game){
+    game->audio->music = Mix_LoadMUS(MUS_PATH);
+
+    //If there was a problem loading the music
+    if (game->audio->music == NULL) {
+        return false;
+    }
+
+    //Load the sound effect
+    game->audio->fail = Mix_LoadWAV(FAIL_EFFECT_PATH);
+
+    //If there was a problem loading the fail sound effect
+    if (game->audio->fail == NULL) {
+        SDL_Log("Could not open test.wav: %s\n", Mix_GetError());
+        return false;
+    }
+
+    //If everything loaded fine
+    return true;
+}
+
+void free_audio(game_t *game) {
+    //Free the sound effects
+    Mix_FreeChunk(game->audio->fail);
+
+    //Free the music
+    Mix_FreeMusic(game->audio->music);
+
+    //Quit SDL_mixer
+    Mix_CloseAudio();
+
+    //Quit SDL
+    SDL_Quit();
 }
