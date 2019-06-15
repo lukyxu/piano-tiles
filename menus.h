@@ -12,12 +12,13 @@
 typedef struct game game_t;
 
 typedef enum menu_option{
-    CLASSIC,
-    TBC,
-    TBC1,
-    TBC2,
+    MENU_CLASSIC,
+    MENU_SPEED,
+    MENU_RUSH,
+    MENU_HUNDRED,
     TOTAL_MENU_OPTIONS
 } menu_option_t;
+
 
 void update_main_menu(game_t *game);
 

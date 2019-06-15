@@ -33,6 +33,23 @@ void init_gamemap(game_t *game, gamemap_t *gamemap) {
     game->gamestatus = PAUSED;
     game->audio->music = NULL;
     game->audio->fail = NULL;
+
+    if (game->gamemode == HUNDRED) {
+        if (gamemap->total_beats >= HUNDRED_TILE_AMOUNT) {
+            // Randomly generate
+            for (int i = HUNDRED_TILE_AMOUNT; i < HUNDRED_TILE_AMOUNT + col_tile_amount + 1; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    if (i == HUNDRED_TILE_AMOUNT) {
+                        gamemap->beatmap[i][j] = END;
+                    }else{
+                        gamemap->beatmap[i][j] = NOTHING;
+                    }
+                }
+            }
+        }else{
+            SDL_Log("Beatmap not enough notes for classic");
+        }
+    }
 }
 
 void play_beat(game_t *game, uint32_t column){
@@ -91,9 +108,6 @@ bool completed_row(const tile_t *row) {
 }
 
 void update_game(game_t *game) {
-    if (!stack_empty(*game->menu_stack)){
-        return;
-    }
     if (game->gamestatus == PAUSED) {
         // Wait for input when paused
         if (handle_game_io(game)) {
@@ -106,6 +120,10 @@ void update_game(game_t *game) {
                 // Unpauses the game
                 game->map->completed_rows++;
                 game->map->current_row++;
+                game->game_start_time = SDL_GetTicks();
+                if((game->gamemode != RUSH)){
+                    game->map->elapsed_beat_time = game->map->tile_period;
+                }
                 game->gamestatus = PLAYING;
                 return;
             }
@@ -116,6 +134,9 @@ void update_game(game_t *game) {
             if (completed_row(game->map->beatmap[game->map->current_row])) {
                 game->map->completed_rows++;
                 game->map->current_row++;
+                if((game->gamemode != RUSH)){
+                    game->map->elapsed_beat_time = game->map->tile_period;
+                }
             }
         };
         if (!(game->gamestatus == PLAYING)) {
@@ -124,6 +145,12 @@ void update_game(game_t *game) {
         // Increases speed of tiles each second by tiles_acceleration
         set_tiles_speed(game->map,
                         1.0 / FPS * game->map->tiles_acceleration + game->map->tiles_speed);
+    }
+
+    if(game->gamemode == SPEED && ((double) SPEED_TIMER_LENGTH) - (SDL_GetTicks() - (double)game->game_start_time) < 0){
+        Mix_PlayChannel(-1, game->audio->fail, 0);
+        Mix_HaltMusic();
+        game->gamestatus = GAME_LOST;
     }
 
     for (int i = 0; i < row_tile_amount; ++i) {
@@ -149,6 +176,59 @@ void update_game(game_t *game) {
         game->map->current_row--;
         // Buffer is used to smooth rendering as rendering is dependent on tile period
         game->map->tile_period = game->map->tile_period_buffer;
+    }
+    if(game->gamemode != RUSH){
+        game->map->elapsed_beat_time = 0;
+    }
+}
+
+void draw_score(game_t *game, SDL_Rect rect, bool flag){
+    char buffer[10];
+    switch (game->gamemode){
+        case CLASSIC:
+            sprintf(buffer, "  %d  ", game->map->completed_rows);
+            draw_text(game, buffer, ROUGH, DARK_RED, rect);
+            break;
+        case SPEED:
+            if (flag == SCORE_LEADERBOARD){
+                sprintf(buffer, "  %d  ", game->map->completed_rows);
+                draw_text(game, buffer, ROUGH, DARK_RED, rect);
+            }else if (game->gamestatus == PAUSED || game->map->completed_rows == 0){
+                sprintf(buffer, "%-.2f", (double) SPEED_TIMER_LENGTH/1000);
+                draw_text(game, buffer, ROUGH, DARK_RED, rect);
+            } else {
+                if ((((double) SPEED_TIMER_LENGTH / 1000) -
+                     (SDL_GetTicks() - (double) game->game_start_time) /
+                     1000) < 0){
+                    sprintf(buffer, "0.00");
+                }else {
+                    sprintf(buffer, "%-.2f", ((double) SPEED_TIMER_LENGTH / 1000) -
+                                             (SDL_GetTicks() - (double) game->game_start_time) /
+                                             1000);
+                }
+                draw_text(game, buffer, ROUGH, DARK_RED,rect);
+            }
+            break;
+        case RUSH:
+            sprintf(buffer, "%-.2f", game->map->tiles_speed);
+            draw_text(game, buffer, ROUGH, DARK_RED, rect);
+            break;
+        case HUNDRED:
+            if (flag == SCORE_LEADERBOARD){
+                if (game->map->completed_rows == HUNDRED_TILE_AMOUNT){
+                    sprintf(buffer, "  %-.2f  ", (SDL_GetTicks() - (double) game->game_start_time) /
+                                              1000);
+                    draw_text(game, buffer, ROUGH, DARK_RED, rect);
+                }else{
+                    sprintf(buffer, "N/A");
+                    draw_text(game, buffer, ROUGH, DARK_RED, rect);
+                }
+            }else {
+                sprintf(buffer, "  %d  ", HUNDRED_TILE_AMOUNT - game->map->completed_rows);
+                draw_text(game, buffer, ROUGH, DARK_RED, rect);
+            }
+            break;
+        default:break;
     }
 }
 
@@ -193,9 +273,9 @@ void draw_game(game_t *game) {
         }
     }
     // Draw the tiles per second indicator
-    char buffer[10];
-    sprintf(buffer, "%-.2f", game->map->tiles_speed);
-    draw_text(game, buffer, ROUGH, DARK_RED ,(SDL_Rect){window_width/4, window_height/20, window_width/2, window_height/5});
+
+    draw_score(game, (SDL_Rect) {window_width / 4, window_height / 20, window_width / 2,
+                                 window_height / 5}, SCORE_GAME);
 }
 
 void delete_game(game_t *game) {

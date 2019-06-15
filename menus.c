@@ -25,20 +25,83 @@ bool update_leaderboard(game_t *game) {
 void add_leaderboard(game_t *game) {
     FILE *fp = fopen(LEADER_BOARD_ADDRESS, "a+");
     if (fp == NULL) {
+        SDL_Log("Could not open leaderboard");
         exit(EXIT_FAILURE);
     }
 
     // Appends the relevant scores to the leader board file
-    switch (game->menu_pointer) {
+    switch (game->gamemode) {
         case CLASSIC:
             fwrite("CLASSIC: ", 1, sizeof("CLASSIC: ") - 1, fp);
+            fprintf(fp, "%d\n", game->map->completed_rows);
+            break;
+        case SPEED:
+            fwrite("SPEED: ", 1, sizeof("SPEED: ") - 1, fp);
+            fprintf(fp, "%d\n", game->map->completed_rows);
+            break;
+        case RUSH:
+            fwrite("RUSH: ", 1, sizeof("RUSH: ") - 1, fp);
             fprintf(fp, "%-.2f\n", game->map->tiles_speed);
+            break;
+        case HUNDRED:
+            if (game->map->completed_rows == HUNDRED_TILE_AMOUNT) {
+                fwrite("HUNDRED: ", 1, sizeof("HUNDRED: ") - 1, fp);
+                fprintf(fp, "%-.2f\n", (SDL_GetTicks() - (double) game->game_start_time) / 1000);
+            }
             break;
         default:
             break;
     }
     fclose(fp);
 }
+
+//char buffer[10];
+//switch (game->gamemode){
+//case CLASSIC:
+//sprintf(buffer, "  %d  ", game->map->completed_rows);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//break;
+//case SPEED:
+//if (flag == SCORE_LEADERBOARD){
+//sprintf(buffer, "  %d  ", game->map->completed_rows);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//}else if (game->gamestatus == PAUSED || game->map->completed_rows == 0){
+//sprintf(buffer, "%-.2f", (double) SPEED_TIMER_LENGTH/1000);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//} else {
+//if ((((double) SPEED_TIMER_LENGTH / 1000) -
+//(SDL_GetTicks() - (double) game->game_start_time) /
+//1000) < 0){
+//sprintf(buffer, "0.00");
+//}else {
+//sprintf(buffer, "%-.2f", ((double) SPEED_TIMER_LENGTH / 1000) -
+//(SDL_GetTicks() - (double) game->game_start_time) /
+//1000);
+//}
+//draw_text(game, buffer, ROUGH, DARK_RED,rect);
+//}
+//break;
+//case RUSH:
+//sprintf(buffer, "%-.2f", game->map->tiles_speed);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//break;
+//case HUNDRED:
+//if (flag == SCORE_LEADERBOARD){
+//if (game->map->completed_rows == HUNDRED_TILE_AMOUNT){
+//sprintf(buffer, "  %-.2f  ", (SDL_GetTicks() - (double) game->game_start_time) /
+//1000);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//}else{
+//sprintf(buffer, "N/A");
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//}
+//}else {
+//sprintf(buffer, "  %d  ", HUNDRED_TILE_AMOUNT - game->map->completed_rows);
+//draw_text(game, buffer, ROUGH, DARK_RED, rect);
+//}
+//break;
+//default:break;
+//}
 
 void draw_leaderboard(game_t *game) {
     // Draws the background
@@ -52,19 +115,42 @@ void draw_leaderboard(game_t *game) {
                                                                               window_height / 5});
     FILE *fp = fopen(LEADER_BOARD_ADDRESS, "r");
     if (fp == NULL) {
+        SDL_Log("Could not open leaderboard");
         exit(EXIT_FAILURE);
     }
 
     char buffer[20];
     int i = 0;
-    char scores[100][10] = {0};
+
+//    char scores[100][10] = {0};
+    int file_length = get_file_lines_length(fp);
+    char (*scores)[10] = malloc(file_length * sizeof(char[10]));
+    
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         char *rest;
         char *token = strtok_r(buffer, ": \n", &rest);
-        switch (game->menu_pointer) {
+        switch (game->gamemode) {
             case CLASSIC:
-                if (!strcmp(token, "CLASSIC")) {
-                    strcpy(scores[i], strtok_r(NULL, ": ", &rest));
+                if (token != NULL && !strcmp(token, "CLASSIC")) {
+                    sprintf(scores[i], "%4d", (int) strtol(strtok_r(NULL, ": ", &rest), NULL, 0));
+                    i++;
+                }
+                break;
+            case SPEED:
+                if (token != NULL && !strcmp(token, "SPEED")) {
+                    sprintf(scores[i], "%4d", (int) strtol(strtok_r(NULL, ": ", &rest), NULL, 0));
+                    i++;
+                }
+                break;
+            case RUSH:
+                if (token != NULL && !strcmp(token, "RUSH")) {
+                    sprintf(scores[i], "%.2f",strtod(strtok_r(NULL, ": ", &rest),NULL));
+                    i++;
+                }
+                break;
+            case HUNDRED:
+                if (token != NULL && !strcmp(token, "HUNDRED")) {
+                    sprintf(scores[i], "%.2f",strtod(strtok_r(NULL, ": ", &rest),NULL));
                     i++;
                 }
                 break;
@@ -72,11 +158,12 @@ void draw_leaderboard(game_t *game) {
                 break;
         }
     }
-    sprintf(buffer, "%-.2f", game->map->tiles_speed);
-    draw_text(game, buffer, ROUGH, DARK_RED,
-              (SDL_Rect) {window_width / 4, window_height / 8, window_width / 2,
-                          window_height / 5});
-    qsort(scores, (size_t) i, sizeof(char) * 10, &compare_scores);
+
+    draw_score(game, (SDL_Rect) {window_width / 4, window_height / 8, window_width / 2,
+                                 window_height / 5}, SCORE_LEADERBOARD);
+
+    qsort(scores, (size_t) i, sizeof(char[10]), &compare_scores);
+
     uint32_t max_col1 = 0;
 
     while (3 * window_height / 10 + max_col1 * window_height / 10 + window_height / 10 <
@@ -93,11 +180,6 @@ void draw_leaderboard(game_t *game) {
     for (int j = 0; j < i; ++j) {
         sprintf(buffer, "%d", j + 1);
 
-        if (strlen(scores[j]) == 5) {
-            scores[j][strlen(scores[j]) - 1] = ' ';
-        } else {
-            scores[j][strlen(scores[j]) - 1] = '\0';
-        }
         if (j < max_col1) {
             // Draws the left index
             draw_text(game, buffer, ROUGH, BLACK,
@@ -125,6 +207,7 @@ void draw_leaderboard(game_t *game) {
         }
     }
 
+    free(scores);
     fclose(fp);
 }
 
@@ -149,16 +232,16 @@ void draw_main_menu(game_t *game) {
                                     window_width / 2, window_width / 2});
 
     // Top left option
-    draw_text(game, "Classic", SMOOTH, WHITE,
+    draw_text(game, "CLASSIC", SMOOTH, WHITE,
               (SDL_Rect) {window_width / 16, window_height - window_width + (window_width / 8),
                           (3 * window_width) / 8, (window_width / 4)});
     // Top right option
-    draw_text(game, "-------", SMOOTH, BLACK,
+    draw_text(game, " SPEED ", SMOOTH, BLACK,
               (SDL_Rect) {window_width / 16 + window_width / 2,
                           window_height - window_width + (window_width / 8), (3 * window_width) / 8,
                           (window_width / 4)});
     // Bottom left option
-    draw_text(game, "-------", SMOOTH, BLACK, (SDL_Rect) {window_width / 16,
+    draw_text(game, " RUSH ", SMOOTH, BLACK, (SDL_Rect) {window_width / 16,
                                                                           window_height -
                                                                           window_width +
                                                                           (window_width / 8) +
@@ -166,32 +249,32 @@ void draw_main_menu(game_t *game) {
                                                                           (3 * window_width) / 8,
                                                                           (window_width / 4)});
     // Bottom right option
-    draw_text(game, "-------", SMOOTH, WHITE,
+    draw_text(game, "HUNDRED", SMOOTH, WHITE,
               (SDL_Rect) {window_width / 16 + window_width / 2,
                           window_height - window_width + (window_width / 8) + (window_width / 2),
                           (3 * window_width) / 8, (window_width / 4)});
 
     switch (game->menu_pointer) {
-        case CLASSIC:
-            draw_text(game, "Classic", SMOOTH, RED,
+        case MENU_CLASSIC:
+            draw_text(game, "CLASSIC", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16,
                                   window_height - window_width + (window_width / 8),
                                   (3 * window_width) / 8, (window_width / 4)});
             break;
-        case TBC:
-            draw_text(game, "-------", SMOOTH, RED,
+        case MENU_SPEED:
+            draw_text(game, " SPEED ", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16 + window_width / 2,
                                   window_height - window_width + (window_width / 8),
                                   (3 * window_width) / 8, (window_width / 4)});
             break;
-        case TBC1:
-            draw_text(game, "-------", SMOOTH, RED,
+        case MENU_RUSH:
+            draw_text(game, " RUSH ", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16,
                                   window_height - window_width + (window_width / 8) +
                                   (window_width / 2), (3 * window_width) / 8, (window_width / 4)});
             break;
-        case TBC2:
-            draw_text(game, "-------", SMOOTH, RED,
+        case MENU_HUNDRED:
+            draw_text(game, "HUNDRED", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16 + window_width / 2,
                                   window_height - window_width + (window_width / 8) +
                                   (window_width / 2), (3 * window_width) / 8, (window_width / 4)});
@@ -213,10 +296,23 @@ void handle_menu_io(game_t *game) {
                     game->menu_pointer = (game->menu_pointer + 1) % (TOTAL_MENU_OPTIONS);
                     break;
                 case SDLK_k:
-                    if (game->menu_pointer == CLASSIC) {
-                        pop(game->menu_stack);
-                        game->loaded_beatmap = false;
+                    switch (game->menu_pointer){
+                        case MENU_CLASSIC:
+                            game->gamemode = CLASSIC;
+                            break;
+                        case MENU_SPEED:
+                            game->gamemode = SPEED;
+                            break;
+                        case MENU_RUSH:
+                            game->gamemode = RUSH;
+                            break;
+                        case MENU_HUNDRED:
+                            game->gamemode = HUNDRED;
+                            break;
+                        default:break;
                     }
+                    pop(game->menu_stack);
+                    game->loaded_beatmap = false;
                     while (SDL_PollEvent(&game->event));
                     break;
                 default:

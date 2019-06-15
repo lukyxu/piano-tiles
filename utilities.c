@@ -29,12 +29,16 @@ void add_padding(beatmap beatmap, int index) {
 bool load_gamemap(char *address, gamemap_t *gamemap) {
     FILE *fp = fopen(address, "r");
     if (fp == NULL){
+        SDL_Log("Could not open leaderboard");
         exit(EXIT_FAILURE);
     }
     char buffer[20];
     while (fgets(buffer, sizeof(buffer), fp) != NULL){
         char *rest;
         char *token = strtok_r(buffer, ": \n", &rest);
+        if (token == NULL){
+            continue;
+        }
         if (!strcmp(token, "accel")){
             gamemap->tiles_acceleration = strtod(strtok_r(NULL, "= ", &rest), NULL);
         }else if (!strcmp(token, "speed")){
@@ -43,12 +47,14 @@ bool load_gamemap(char *address, gamemap_t *gamemap) {
         else if (!strcmp(token, "--BEGIN-GAME--")){
             break;
         }else{
+            SDL_Log("Invalid input for bin file");
             exit(EXIT_FAILURE);
         }
     }
 
     beatmap beatmap = calloc(MAX_SIZE, sizeof(row));
     if (!load_beatmap(beatmap, fp, &gamemap->total_beats)){
+        SDL_Log("Could not load beatmap");
         exit(EXIT_FAILURE);
     }
 
@@ -61,7 +67,7 @@ bool load_gamemap(char *address, gamemap_t *gamemap) {
 }
 
 // Returns true iff the beatmap is loaded successfully
-bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
+bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_rows){
     uint32_t index = 0;
     while(true){
         beatmap[index] = calloc(4, sizeof(tile_t));
@@ -76,7 +82,7 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
                 beatmap[index][1] = 3;
                 beatmap[index][2] = 3;
                 beatmap[index][3] = 3;
-                *total_beats = index;
+                *total_rows = index;
                 // Add padding to allow indexes to be read after the game end
                 add_padding(beatmap, index);
                 return true;
@@ -93,5 +99,22 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_beats){
 
 int compare_scores(const void* a, const void* b)
 {
-    return strtod(a,NULL) < strtod(b,NULL);
+    char *temp1 = (char *) a;
+    char *temp2 = (char *) b;
+    return strtod(temp1,NULL) < strtod(temp2,NULL);
+//    return (double *) *a < (double *) *b;
+//    return strtod(a,NULL) < strtod(b,NULL);
+}
+
+uint32_t get_file_lines_length(FILE *fp){
+    fseek ( fp , 0 , SEEK_SET );
+    uint32_t output = 0;
+    int chr;
+    while((chr = getc(fp)) != EOF){
+        if (chr == '\n'){
+            output ++;
+        }
+    }
+    fseek ( fp , 0 , SEEK_SET);
+    return output;
 }

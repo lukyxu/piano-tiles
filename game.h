@@ -26,6 +26,14 @@
 #define MUS_PATH "test.wav"
 #define FAIL_EFFECT_PATH "fail.wav"
 
+#define HUNDRED_TILE_AMOUNT 100
+#define SPEED_TIMER_LENGTH 30000
+
+enum{
+    SCORE_LEADERBOARD,
+    SCORE_GAME
+};
+
 typedef enum GameStatus {
     PLAYING,
     PAUSED,
@@ -43,9 +51,19 @@ typedef struct audio_files{
     Mix_Chunk *fail;
 }audio_files_t;
 
+typedef enum game_mode{
+    CLASSIC,
+    SPEED,
+    RUSH,
+    HUNDRED,
+    TOTAL_GAME_MODES_OPTIONS
+} game_mode_t;
+
 typedef struct game {
     bool is_running;
     bool loaded_beatmap;
+    uint32_t game_start_time;
+    game_mode_t gamemode;
     gamestatus_t gamestatus;
     gamemap_t *map;
     stack *menu_stack;
@@ -62,6 +80,7 @@ void init_gamemap(game_t *game, gamemap_t *gamemap);
 void play_beat(game_t *game, uint32_t column);
 bool handle_game_io(game_t *game);
 void update_game(game_t *game);
+void draw_score(game_t *game, SDL_Rect rect, bool flag);
 void draw_game(game_t *game);
 void delete_game(game_t *game);
 bool load_audio(game_t *game);

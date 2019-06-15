@@ -19,8 +19,11 @@ void init_game(game_t *game) {
 
 void game_loop(game_t *game) {
     uint32_t frame_start = SDL_GetTicks();
-    update_game(game);
+    if (stack_empty(*game->menu_stack)){
+        update_game(game);
+    }
     draw_game(game);
+
     uint32_t frame_time = SDL_GetTicks() - frame_start;
 
     if (frame_delay > frame_time) {
@@ -47,7 +50,9 @@ int main(int argc, char *argv[]) {
     gamemap_t *gamemap = malloc(sizeof(gamemap_t));
     game_t *game = malloc(sizeof(game_t));
     init_game(game);
-
+    if (argc != 2){
+        printf("First argument should be beatmap file");
+    }
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
 
     while (game->is_running) {
@@ -91,7 +96,6 @@ int main(int argc, char *argv[]) {
             while(SDL_PollEvent(&game->event));
         }
     }
-
     // Game is over
     free_audio(game);
     delete_game(game);
