@@ -97,13 +97,14 @@ bool load_beatmap(beatmap beatmap, FILE *fp, uint32_t *total_rows){
     }
 }
 
-int compare_scores(const void* a, const void* b)
+int compare_desc_scores(const void *a, const void *b)
 {
-    char *temp1 = (char *) a;
-    char *temp2 = (char *) b;
-    return strtod(temp1,NULL) < strtod(temp2,NULL);
-//    return (double *) *a < (double *) *b;
-//    return strtod(a,NULL) < strtod(b,NULL);
+    return strtod(a,NULL) < strtod(b,NULL);
+}
+
+int compare_asc_scores(const void *a, const void *b)
+{
+    return strtod(a,NULL) > strtod(b,NULL);
 }
 
 uint32_t get_file_lines_length(FILE *fp){

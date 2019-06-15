@@ -62,7 +62,7 @@ typedef enum game_mode{
 typedef struct game {
     bool is_running;
     bool loaded_beatmap;
-    uint32_t game_start_time;
+    uint32_t game_time_tracker;
     game_mode_t gamemode;
     gamestatus_t gamestatus;
     gamemap_t *map;

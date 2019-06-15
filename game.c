@@ -120,7 +120,7 @@ void update_game(game_t *game) {
                 // Unpauses the game
                 game->map->completed_rows++;
                 game->map->current_row++;
-                game->game_start_time = SDL_GetTicks();
+                game->game_time_tracker = SDL_GetTicks();
                 if((game->gamemode != RUSH)){
                     game->map->elapsed_beat_time = game->map->tile_period;
                 }
@@ -147,7 +147,7 @@ void update_game(game_t *game) {
                         1.0 / FPS * game->map->tiles_acceleration + game->map->tiles_speed);
     }
 
-    if(game->gamemode == SPEED && ((double) SPEED_TIMER_LENGTH) - (SDL_GetTicks() - (double)game->game_start_time) < 0){
+    if(game->gamemode == SPEED && ((double) SPEED_TIMER_LENGTH) - (SDL_GetTicks() - (double)game->game_time_tracker) < 0){
         Mix_PlayChannel(-1, game->audio->fail, 0);
         Mix_HaltMusic();
         game->gamestatus = GAME_LOST;
@@ -198,12 +198,12 @@ void draw_score(game_t *game, SDL_Rect rect, bool flag){
                 draw_text(game, buffer, ROUGH, DARK_RED, rect);
             } else {
                 if ((((double) SPEED_TIMER_LENGTH / 1000) -
-                     (SDL_GetTicks() - (double) game->game_start_time) /
+                     (SDL_GetTicks() - (double) game->game_time_tracker) /
                      1000) < 0){
                     sprintf(buffer, "0.00");
                 }else {
                     sprintf(buffer, "%-.2f", ((double) SPEED_TIMER_LENGTH / 1000) -
-                                             (SDL_GetTicks() - (double) game->game_start_time) /
+                                             (SDL_GetTicks() - (double) game->game_time_tracker) /
                                              1000);
                 }
                 draw_text(game, buffer, ROUGH, DARK_RED,rect);
@@ -216,8 +216,7 @@ void draw_score(game_t *game, SDL_Rect rect, bool flag){
         case HUNDRED:
             if (flag == SCORE_LEADERBOARD){
                 if (game->map->completed_rows == HUNDRED_TILE_AMOUNT){
-                    sprintf(buffer, "  %-.2f  ", (SDL_GetTicks() - (double) game->game_start_time) /
-                                              1000);
+                    sprintf(buffer, "  %-.2f  ", (double) (game->game_time_tracker) / 1000);
                     draw_text(game, buffer, ROUGH, DARK_RED, rect);
                 }else{
                     sprintf(buffer, "N/A");

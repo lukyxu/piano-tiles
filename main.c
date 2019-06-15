@@ -89,6 +89,7 @@ int main(int argc, char *argv[]) {
         if (game->gamestatus == GAME_WON || game->gamestatus == GAME_LOST) {
             // Game is won/lost
             game->gamestatus = PAUSED;
+            game->game_time_tracker = (SDL_GetTicks() - game->game_time_tracker);
             add_leaderboard(game);
             push(game->menu_stack, LEADER_BOARD);
             SDL_Log("Game Over");

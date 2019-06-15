@@ -46,7 +46,7 @@ void add_leaderboard(game_t *game) {
         case HUNDRED:
             if (game->map->completed_rows == HUNDRED_TILE_AMOUNT) {
                 fwrite("HUNDRED: ", 1, sizeof("HUNDRED: ") - 1, fp);
-                fprintf(fp, "%-.2f\n", (SDL_GetTicks() - (double) game->game_start_time) / 1000);
+                fprintf(fp, "%-.2f\n", ((double) game->game_time_tracker) / 1000);
             }
             break;
         default:
@@ -162,7 +162,12 @@ void draw_leaderboard(game_t *game) {
     draw_score(game, (SDL_Rect) {window_width / 4, window_height / 8, window_width / 2,
                                  window_height / 5}, SCORE_LEADERBOARD);
 
-    qsort(scores, (size_t) i, sizeof(char[10]), &compare_scores);
+    if (game->gamemode == HUNDRED) {
+        qsort(scores, (size_t) i, sizeof(char[10]), &compare_asc_scores);
+
+    }else{
+        qsort(scores, (size_t) i, sizeof(char[10]), &compare_desc_scores);
+    }
 
     uint32_t max_col1 = 0;
 
