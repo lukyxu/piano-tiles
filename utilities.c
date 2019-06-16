@@ -64,6 +64,7 @@ bool load_gamemap(char *address, gamemap_t *gamemap) {
     gamemap->current_row = 0;
     set_tile_period(gamemap);
     gamemap->beatmap = beatmap;
+    return true;
 }
 
 // Returns true iff the beatmap is loaded successfully

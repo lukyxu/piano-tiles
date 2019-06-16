@@ -7,6 +7,10 @@
 
 bool update_leaderboard(game_t *game) {
     while (SDL_PollEvent(&game->event)) {
+        if (game->event.type == SDL_QUIT){
+            game->is_running = false;
+            return true;
+        }
         if (game->event.type == SDL_KEYDOWN) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_k:
@@ -292,6 +296,10 @@ void draw_main_menu(game_t *game) {
 
 void handle_menu_io(game_t *game) {
     while (SDL_PollEvent(&game->event)) {
+        if (game->event.type == SDL_QUIT){
+            game->is_running = false;
+            return;
+        }
         if (game->event.type == SDL_KEYDOWN) {
             switch (game->event.key.keysym.sym) {
                 case SDLK_f:

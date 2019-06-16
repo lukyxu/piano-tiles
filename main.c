@@ -10,6 +10,7 @@
 #include "menus.h"
 
 void init_game(game_t *game) {
+    game->gamemode = CLASSIC;
     game->menu_stack = malloc(sizeof(stack));
     *(game->menu_stack) = NULL;
     push(game->menu_stack, MAIN_MENU);
@@ -44,7 +45,7 @@ void leaderboard_loop(game_t *game){
     SDL_RenderPresent(game->renderer);
     // Loops until a valid input is received
     while (!update_leaderboard(game));
-};
+}
 
 int main(int argc, char *argv[]) {
     gamemap_t *gamemap = malloc(sizeof(gamemap_t));
