@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS = -std=c99 -Wall -g -pedantic
+CFLAGS = -std=gnu11 -Wall -g -pedantic
 
 LIBS = -lSDL2 -lSDL2_test -lSDL2_ttf -lSDL2_mixer
 

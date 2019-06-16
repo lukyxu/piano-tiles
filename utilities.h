@@ -21,7 +21,7 @@
 #define RED ((SDL_Color) {255, 0, 0})
 #define DARK_RED ((SDL_Color) {200, 0, 0})
 
-static const uint32_t MAX_SIZE = 65536;
+static const uint32_t MAX_SIZE = 1000;
 
 void draw_text(game_t *game, char *str, uint32_t font_size,SDL_Color colour, SDL_Rect rect);
 

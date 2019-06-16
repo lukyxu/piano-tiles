@@ -278,8 +278,8 @@ void draw_game(game_t *game) {
 }
 
 void delete_game(game_t *game) {
-    SDL_DestroyWindow(game->window);
-    SDL_DestroyRenderer(game->renderer);
+//    SDL_DestroyWindow(game->window);
+//    SDL_DestroyRenderer(game->renderer);
     SDL_Quit();
     free(game->audio);
     free(game->map);
@@ -317,7 +317,4 @@ void free_audio(game_t *game) {
 
     // Quit SDL_mixer
     Mix_CloseAudio();
-
-    // Quit SDL
-    SDL_Quit();
 }

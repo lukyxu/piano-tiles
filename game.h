@@ -59,7 +59,7 @@ typedef enum game_mode{
     TOTAL_GAME_MODES_OPTIONS
 } game_mode_t;
 
-typedef struct game {
+struct game {
     bool is_running;
     bool loaded_beatmap;
     uint32_t game_time_tracker;
@@ -72,7 +72,7 @@ typedef struct game {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
-} game_t;
+};
 
 
 void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height);

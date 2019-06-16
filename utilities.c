@@ -5,6 +5,7 @@
 #include "utilities.h"
 
 #include <stdlib.h>
+#define _GNU_SOURCE
 #include <string.h>
 
 
@@ -29,7 +30,7 @@ void add_padding(beatmap beatmap, int index) {
 bool load_gamemap(char *address, gamemap_t *gamemap) {
     FILE *fp = fopen(address, "r");
     if (fp == NULL){
-        SDL_Log("Could not open leaderboard");
+        SDL_Log("Could not open gamemap");
         exit(EXIT_FAILURE);
     }
     char buffer[20];
