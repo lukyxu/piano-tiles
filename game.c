@@ -7,7 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 
 void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int width, int height) {
-    if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) == 0) {
         SDL_Log("Game initialized");
         TTF_Init();
         game->window = SDL_CreateWindow(title, xpos, ypos, width, height, false);
@@ -171,6 +171,7 @@ void update_game(game_t *game) {
     }
     if (game->map->elapsed_beat_time >= game->map->tile_period) {
         // Tile goes out of the window
+        free(game->map->beatmap[0]);
         game->map->beatmap++;
         game->map->elapsed_beat_time = 0;
         game->map->current_row--;
@@ -278,8 +279,9 @@ void draw_game(game_t *game) {
 }
 
 void delete_game(game_t *game) {
+    //free(game->map->beatmap);
     SDL_DestroyWindow(game->window);
-    SDL_DestroyRenderer(game->renderer);
+//    SDL_DestroyRenderer(game->renderer);
     SDL_Quit();
     free(game->audio);
     free(game->map);
@@ -317,7 +319,4 @@ void free_audio(game_t *game) {
 
     // Quit SDL_mixer
     Mix_CloseAudio();
-
-    // Quit SDL
-    SDL_Quit();
 }

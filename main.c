@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
     init_game(game);
     if (argc != 2){
         printf("First argument should be beatmap file");
+        exit(EXIT_FAILURE);
     }
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
 

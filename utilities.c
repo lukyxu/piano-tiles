@@ -15,8 +15,9 @@ void draw_text(game_t *game, char *str, uint32_t font_size, SDL_Color colour, SD
     }
     SDL_Surface *surface_message = TTF_RenderText_Solid(font, str, colour);
     SDL_Texture *message = SDL_CreateTextureFromSurface(game->renderer, surface_message);
-    free(surface_message);
     SDL_RenderCopy(game->renderer, message, NULL, &rect);
+    SDL_DestroyTexture(message);
+    SDL_FreeSurface(surface_message);
 }
 
 void add_padding(beatmap beatmap, int index) {
