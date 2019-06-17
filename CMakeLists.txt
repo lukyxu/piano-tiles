@@ -13,4 +13,4 @@ add_executable(piano_tiles
 
 target_link_libraries(piano_tiles ncurses)
 
-target_link_libraries(piano_tiles SDL2main SDL2 SDL2_test SDL2_ttf SDL2_mixer)
+target_link_libraries(piano_tiles SDL2main SDL2 SDL2_test SDL2_ttf SDL2_mixer SDL2_image)

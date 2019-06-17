@@ -4,6 +4,7 @@
 
 #include "menus.h"
 #include "utilities.h"
+#include <SDL2/SDL_image.h>
 
 bool update_leaderboard(game_t *game) {
     while (SDL_PollEvent(&game->event)) {
@@ -220,19 +221,87 @@ void draw_leaderboard(game_t *game) {
     fclose(fp);
 }
 
-void update_main_menu(game_t *game) {
-    handle_menu_io(game);
+
+
+bool update_main_menu(game_t *game) {
+    while (SDL_PollEvent(&game->event)) {
+        if (game->event.type == SDL_QUIT){
+            game->is_running = false;
+            return true;
+        }
+        if (game->event.type == SDL_KEYDOWN) {
+            switch (game->event.key.keysym.sym) {
+                case SDLK_f:
+                    game->menu_pointer.main_menu_pointer = (game->menu_pointer.main_menu_pointer - 1) % (TOTAL_MENU_OPTIONS);
+                    draw_main_menu(game);
+                    SDL_RenderPresent(game->renderer);
+                    break;
+                case SDLK_j:
+                    game->menu_pointer.main_menu_pointer = (game->menu_pointer.main_menu_pointer + 1) % (TOTAL_MENU_OPTIONS);
+                    draw_main_menu(game);
+                    SDL_RenderPresent(game->renderer);
+                    break;
+                case SDLK_k:
+                    switch (game->menu_pointer.main_menu_pointer){
+                        case MENU_CLASSIC:
+                            game->gamemode = CLASSIC;
+                            break;
+                        case MENU_SPEED:
+                            game->gamemode = SPEED;
+                            break;
+                        case MENU_RUSH:
+                            game->gamemode = RUSH;
+                            break;
+                        case MENU_HUNDRED:
+                            game->gamemode = HUNDRED;
+                            break;
+                        default:break;
+                    }
+                    pop(game->menu_stack);
+                    if (game->menu_pointer.main_menu_pointer == MENU_OPTION){
+                        push(game->menu_stack, OPTIONS_MENU);
+                    }
+                    game->loaded_beatmap = false;
+                    while (SDL_PollEvent(&game->event));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+    return false;
 }
 
 void draw_main_menu(game_t *game) {
+    static SDL_Texture *option_img = NULL;
+    static SDL_Texture *option_red_img = NULL;
+    if (option_img == NULL){
+        option_img = IMG_LoadTexture(game->renderer, "option.png");
+        if (option_img == NULL){
+            SDL_Log("Failed to load option.png");
+            SDL_Log("%s", SDL_GetError());
+            exit(EXIT_FAILURE);
+        }
+    }
+    if (option_red_img == NULL){
+        option_red_img = IMG_LoadTexture(game->renderer, "option_red.png");
+        if (option_red_img == NULL){
+            SDL_Log("Failed to load option_red.png");
+            exit(EXIT_FAILURE);
+        }
+    }
     SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
     SDL_RenderClear(game->renderer);
 
     SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
     // 100 400
-    draw_text(game, "Piano Tiles", ROUGH, BLACK,
-              (SDL_Rect) {window_width / 6, window_height / 30,
-                          (int) (window_width / 1.5), window_height / 5});
+    draw_text(game, "Piano Tiles", ROUGH, BLACK, (SDL_Rect) {window_width / 16, window_height / 30,
+                                                         (7 * window_width /
+                                                          8),
+                                                         window_height / 5});
+//    draw_text(game, "Piano Tiles", ROUGH, BLACK,
+//              (SDL_Rect) {window_width / 6, window_height / 30,
+//                          (int) (window_width / 1.5), window_height / 5});
     SDL_RenderFillRect(game->renderer,
                        &(SDL_Rect) {0, window_height - window_width, window_width / 2,
                                     window_width / 2});
@@ -263,7 +332,15 @@ void draw_main_menu(game_t *game) {
                           window_height - window_width + (window_width / 8) + (window_width / 2),
                           (3 * window_width) / 8, (window_width / 4)});
 
-    switch (game->menu_pointer) {
+    if (game->menu_pointer.main_menu_pointer == MENU_OPTION){
+        SDL_RenderCopy(game->renderer, option_red_img, NULL, &(SDL_Rect){(window_width/8) - (window_width / 10), window_height - window_width - window_width/8, window_width/10,
+                                                                         window_width/10});
+    }else{
+        SDL_RenderCopy(game->renderer, option_img, NULL, &(SDL_Rect){(window_width/8) - (window_width / 10), window_height - window_width - window_width/8, window_width/10,
+                                                                     window_width/10});
+    }
+
+    switch (game->menu_pointer.main_menu_pointer) {
         case MENU_CLASSIC:
             draw_text(game, "CLASSIC", SMOOTH, RED,
                       (SDL_Rect) {window_width / 16,
@@ -293,44 +370,47 @@ void draw_main_menu(game_t *game) {
     }
 }
 
+void draw_options_menu(game_t *game) {
+    SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
+    SDL_RenderClear(game->renderer);
 
-void handle_menu_io(game_t *game) {
+    // Draws the leaderboard header
+    draw_text(game, "OPTIONS", ROUGH, BLACK, (SDL_Rect) {window_width / 16, 0,
+                                                              (7 * window_width /
+                                                               8),
+                                                              window_height / 5});
+    draw_text(game, "Map", ROUGH, BLACK, (SDL_Rect) {window_width / 16, window_height * 2 / 11,
+                                                         (window_width /
+                                                          5),
+                                                         window_height / 10});
+    char buffer[20] = {0};
+    strcpy(buffer, game->beatmap_address);
+    for (int i = (int) strlen(game->beatmap_address); i < 19; ++i) {
+        buffer[i] = ' ';
+    }
+    draw_text(game, buffer, ROUGH, BLACK, (SDL_Rect) {window_width / 2, window_height * 2 / 11,
+                                                     (window_width /
+                                                      2),
+                                                     window_height / 10});
+
+}
+
+bool update_options_menu(game_t *game) {
     while (SDL_PollEvent(&game->event)) {
         if (game->event.type == SDL_QUIT){
             game->is_running = false;
-            return;
+            return true;
         }
         if (game->event.type == SDL_KEYDOWN) {
-            switch (game->event.key.keysym.sym) {
-                case SDLK_f:
-                    game->menu_pointer = (game->menu_pointer - 1) % (TOTAL_MENU_OPTIONS);
-                    break;
-                case SDLK_j:
-                    game->menu_pointer = (game->menu_pointer + 1) % (TOTAL_MENU_OPTIONS);
-                    break;
-                case SDLK_k:
-                    switch (game->menu_pointer){
-                        case MENU_CLASSIC:
-                            game->gamemode = CLASSIC;
-                            break;
-                        case MENU_SPEED:
-                            game->gamemode = SPEED;
-                            break;
-                        case MENU_RUSH:
-                            game->gamemode = RUSH;
-                            break;
-                        case MENU_HUNDRED:
-                            game->gamemode = HUNDRED;
-                            break;
-                        default:break;
-                    }
+            switch (game->event.key.keysym.sym){
+            case SDLK_k:
                     pop(game->menu_stack);
-                    game->loaded_beatmap = false;
+                    push(game->menu_stack, MAIN_MENU);
                     while (SDL_PollEvent(&game->event));
-                    break;
-                default:
-                    return;
+                    return true;
+                default:break;
             }
         }
     }
+    return false;
 }

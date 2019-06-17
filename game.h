@@ -43,7 +43,8 @@ typedef enum GameStatus {
 
 typedef enum Menus{
     MAIN_MENU,
-    LEADER_BOARD
+    LEADER_BOARD,
+    OPTIONS_MENU
 }menu_t;
 
 typedef struct audio_files{
@@ -63,11 +64,12 @@ typedef struct game {
     bool is_running;
     bool loaded_beatmap;
     uint32_t game_time_tracker;
+    char * beatmap_address;
     game_mode_t gamemode;
     gamestatus_t gamestatus;
     gamemap_t *map;
     stack *menu_stack;
-    menu_option_t menu_pointer;
+    menu_pointer_t menu_pointer;
     audio_files_t *audio;
     SDL_Window *window;
     SDL_Renderer *renderer;

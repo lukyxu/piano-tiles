@@ -9,7 +9,8 @@
 #include "stack.h"
 #include "menus.h"
 
-void init_game(game_t *game) {
+void init_game(game_t *game, char *address) {
+    game->beatmap_address = address;
     game->gamemode = CLASSIC;
     game->menu_stack = malloc(sizeof(stack));
     *(game->menu_stack) = NULL;
@@ -19,6 +20,9 @@ void init_game(game_t *game) {
 }
 
 void game_loop(game_t *game) {
+    if (game->loaded_beatmap == false){
+        return;
+    }
     uint32_t frame_start = SDL_GetTicks();
     if (stack_empty(*game->menu_stack)){
         update_game(game);
@@ -36,8 +40,9 @@ void game_loop(game_t *game) {
 }
 
 void main_menu_loop(game_t *game) {
-    update_main_menu(game);
     draw_main_menu(game);
+    SDL_RenderPresent(game->renderer);
+    while(!update_main_menu(game));
 }
 
 void leaderboard_loop(game_t *game){
@@ -47,20 +52,28 @@ void leaderboard_loop(game_t *game){
     while (!update_leaderboard(game));
 }
 
+void options_loop(game_t *game){
+    draw_options_menu(game);
+    SDL_RenderPresent(game->renderer);
+    while(!update_options_menu(game));
+};
+
 int main(int argc, char *argv[]) {
     gamemap_t *gamemap = malloc(sizeof(gamemap_t));
     game_t *game = malloc(sizeof(game_t));
-    init_game(game);
-    if (argc != 2){
-        printf("First argument should be beatmap file");
+    if (argc < 2){
+        printf("First argument should be default beatmap");
         exit(EXIT_FAILURE);
     }
+    init_game(game,argv[1]);
     init_sdl_window(game, "Piano Tiles", 0, 0, window_width, window_height);
-
     while (game->is_running) {
         if (!game->loaded_beatmap) {
             // Initializes gamemap
-            load_gamemap(argv[1], gamemap);
+            if (!load_gamemap(game->beatmap_address, gamemap)){
+                SDL_Log("Could not load gamemap");
+                exit(EXIT_FAILURE);
+            }
             init_gamemap(game, gamemap);
             load_audio(game);
             game->loaded_beatmap = true;
@@ -77,6 +90,9 @@ int main(int argc, char *argv[]) {
                     break;
                 case LEADER_BOARD:
                     leaderboard_loop(game);
+                    break;
+                case OPTIONS_MENU:
+                    options_loop(game);
                     break;
                 default:
                     break;

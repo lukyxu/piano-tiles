@@ -29,7 +29,7 @@ void init_sdl_window(game_t *game, const char *title, int xpos, int ypos, int wi
 
 void init_gamemap(game_t *game, gamemap_t *gamemap) {
     game->map = gamemap;
-    game->menu_pointer = 0;
+    game->menu_pointer.main_menu_pointer = 0;
     game->gamestatus = PAUSED;
     game->audio->music = NULL;
     game->audio->fail = NULL;

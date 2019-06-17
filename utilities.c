@@ -28,10 +28,13 @@ void add_padding(beatmap beatmap, int index) {
 
 // Returns true iff the gamemap is loaded sucessfully
 bool load_gamemap(char *address, gamemap_t *gamemap) {
+    if (address == NULL){
+        return false;
+    }
     FILE *fp = fopen(address, "r");
     if (fp == NULL){
-        SDL_Log("Could not open leaderboard");
-        exit(EXIT_FAILURE);
+        SDL_Log("Could not open beatmap");
+        return false;
     }
     char buffer[20];
     while (fgets(buffer, sizeof(buffer), fp) != NULL){
@@ -49,7 +52,7 @@ bool load_gamemap(char *address, gamemap_t *gamemap) {
             break;
         }else{
             SDL_Log("Invalid input for bin file");
-            exit(EXIT_FAILURE);
+            return false;
         }
     }
 
