@@ -2,7 +2,7 @@ CC = gcc
 
 CFLAGS = -std=gnu11 -Wall -g -pedantic
 
-LIBS = -lSDL2 -lSDL2_test -lSDL2_ttf -lSDL2_mixer
+LIBS = -lSDL2 -lSDL2_test -lSDL2_ttf -lSDL2_mixer -lSDL2_image
 
 .SUFFIXES: .c .o .h
 
